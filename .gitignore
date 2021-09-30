@@ -12,6 +12,7 @@
 /.metadata/
 /.settings/
 /libs/
+/.vscode/
 
 # File Extensions
 *.psd
