@@ -5,8 +5,8 @@ import com.google.common.collect.Maps;
 import info.tehnut.soulbound.api.SlottedItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.PersistentState;
 
@@ -19,51 +19,54 @@ public class SoulboundPersistentState extends PersistentState {
 
     private final Map<UUID, List<SlottedItem>> persistedItems = Maps.newHashMap();
 
-    public SoulboundPersistentState() {
-        super("soulbound_persisted_items");
-    }
+    public SoulboundPersistentState () {};
 
+    public static SoulboundPersistentState fromNbt(NbtCompound nbt) {
+        SoulboundPersistentState ourState = new SoulboundPersistentState();
+
+        ourState.readNbt(nbt);
+        return ourState;
+
+    }
     public void storePlayer(PlayerEntity player, List<SlottedItem> items) {
         this.persistedItems.put(player.getGameProfile().getId(), items);
         markDirty();
     }
 
     public List<SlottedItem> restorePlayer(PlayerEntity player) {
-        List<SlottedItem> items = persistedItems.getOrDefault(player.getGameProfile().getId(), Collections.emptyList());
-        persistedItems.remove(player.getGameProfile().getId());
+        List<SlottedItem> items = this.persistedItems.getOrDefault(player.getGameProfile().getId(), Collections.emptyList());
+        this.persistedItems.remove(player.getGameProfile().getId());
         markDirty();
         return items;
     }
 
-    @Override
-    public void fromTag(CompoundTag tag) {
+    public void readNbt(NbtCompound tag) {
         tag.getList("playerTags", 10).forEach(playerTag -> {
-            CompoundTag playerCompound = (CompoundTag) playerTag;
+            NbtCompound playerCompound = (NbtCompound) playerTag;
             UUID uuid = playerCompound.getUuid("uuid");
-            ListTag items = playerCompound.getList("items", 10);
+            NbtList items = playerCompound.getList("items", 10);
             List<SlottedItem> slotted = Lists.newArrayList();
             items.forEach(itemTag -> {
-                CompoundTag itemCompound = (CompoundTag) itemTag;
+                NbtCompound itemCompound = (NbtCompound) itemTag;
                 Identifier id = new Identifier(itemCompound.getString("id"));
-                ItemStack stack = ItemStack.fromTag(itemCompound.getCompound("stack"));
+                ItemStack stack = ItemStack.fromNbt(itemCompound.getCompound("stack"));
                 int slot = itemCompound.getInt("slot");
                 slotted.add(new SlottedItem(id, stack, slot));
             });
-            persistedItems.put(uuid, slotted);
+            this.persistedItems.put(uuid, slotted);
         });
     }
 
-    @Override
-    public CompoundTag toTag(CompoundTag tag) {
-        ListTag playerTags = new ListTag();
+    public NbtCompound writeNbt(NbtCompound tag) {
+        NbtList playerTags = new NbtList();
         persistedItems.forEach((uuid, items) -> {
-            CompoundTag playerTag = new CompoundTag();
+            NbtCompound playerTag = new NbtCompound();
             playerTag.putUuid("uuid", uuid);
-            ListTag itemsList = new ListTag();
+            NbtList itemsList = new NbtList();
             items.forEach(slotted -> {
-                CompoundTag itemTag = new CompoundTag();
+                NbtCompound itemTag = new NbtCompound();
                 itemTag.putString("id", slotted.getContainerId().toString());
-                itemTag.put("stack", slotted.getStack().toTag(new CompoundTag()));
+                itemTag.put("stack", slotted.getStack().writeNbt(new NbtCompound()));
                 itemTag.putInt("slot", slotted.getSlot());
                 itemsList.add(itemTag);
             });

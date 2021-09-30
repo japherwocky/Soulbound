@@ -1,10 +1,9 @@
 plugins {
-    id "com.matthewprenger.cursegradle" version "1.4.0"
-    id 'fabric-loom' version '0.4-SNAPSHOT'
+    id 'fabric-loom' version '0.9-SNAPSHOT'
     id "maven-publish"
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_1_8
 
 def build_number = System.getenv('BUILD_NUMBER') != null ? System.getenv('BUILD_NUMBER') : 'CUSTOM'
@@ -18,16 +17,22 @@ minecraft {
 }
 
 repositories {
-    maven { url = "https://maven.abusedmaster.xyz/" }
-    maven { url = "https://jitpack.io" }
+	maven {
+		name = "TerraformersMC"
+		url = "https://maven.terraformersmc.com/"
+	}
+	maven {
+		name = "Ladysnake Libs"
+		url = "https://ladysnake.jfrog.io/artifactory/mods"
+	}
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${mc_version}"
     mappings "net.fabricmc:yarn:${mc_version}+build.${mappings_version}:v2"
-    modCompile "net.fabricmc:fabric-loader:${loader_version}"
-    modCompile "net.fabricmc.fabric-api:fabric-api:${api_version}"
-    modCompile "com.github.emilyploszaj:trinkets:v${trinkets_version}"
+    modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${api_version}"
+    modImplementation "dev.emi:trinkets:${trinkets_version}"
 }
 
 task sourcesJar(type: Jar) {
@@ -40,49 +45,6 @@ task apiJar(type: Jar) {
     from sourceSets.main.output
     include 'info/tehnut/soulbound/api/**/*'
     classifier = 'api'
-}
-
-publishing {
-    tasks.publish.dependsOn 'build'
-    publications {
-        mavenJava(MavenPublication) {
-            artifact remapJar
-            artifact sourcesJar
-            artifact apiJar
-        }
-    }
-    repositories {
-        if (project.hasProperty('maven_repo')) {
-            maven { url maven_repo }
-        } else {
-            mavenLocal()
-        }
-    }
-}
-
-curseforge {
-    if (project.hasProperty('curse_key_TehNut'))
-        apiKey = project.curse_key_TehNut
-
-    project {
-        id = "${curse_id}"
-        changelog = getChangelogText()
-        releaseType = 'release'
-        
-        addGameVersion "1.16.1"
-        addGameVersion "Java 8"
-        addArtifact sourcesJar
-        addArtifact apiJar
-        mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
-        
-        afterEvaluate {
-            uploadTask.dependsOn(remapJar)
-        }
-    }
-    
-    options {
-        forgeGradleIntegration = false
-    }
 }
 
 String getChangelogText() {
