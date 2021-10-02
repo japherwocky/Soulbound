@@ -8,7 +8,6 @@ import info.tehnut.soulbound.core.SoulboundPersistentState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,13 +18,14 @@ import java.util.List;
 @Mixin(value = PlayerEntity.class, priority = 6969)
 public class MixinPlayerEntity {
 
+    // after a player death, this is called to clear the inventory
     @Inject(method = "dropInventory", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;dropAll()V"))
     private void soulbound$dropInventory(CallbackInfo callbackInfo) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if ( player.getServer() == null)
             return;
 
-        SoulboundPersistentState persistentState =  player.getServer().getOverworld().getPersistentStateManager().getOrCreate(SoulboundPersistentState::new, "soulbound_persisted_items");
+        SoulboundPersistentState persistentState =  player.getServer().getOverworld().getPersistentStateManager().getOrCreate(SoulboundPersistentState::fromNbt, SoulboundPersistentState::new, "soulbound");
         List<SlottedItem> soulboundItems = Lists.newArrayList();
         SoulboundContainer.CONTAINERS.forEach((id, container) -> {
             List<ItemStack> inventory = container.getContainerStacks(player);

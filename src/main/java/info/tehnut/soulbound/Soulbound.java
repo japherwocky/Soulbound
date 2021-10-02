@@ -46,9 +46,9 @@ public class Soulbound implements ModInitializer {
     public void onInitialize() {
         Registry.register(Registry.ENCHANTMENT, new Identifier("soulbound", "soulbound"), ENCHANT_SOULBOUND);
 
-        SoulboundContainer.CONTAINERS.put(new Identifier("soulbound", "inv_main"), player -> player.inventory.main);
-        SoulboundContainer.CONTAINERS.put(new Identifier("soulbound", "inv_off"), player -> player.inventory.offHand);
-        SoulboundContainer.CONTAINERS.put(new Identifier("soulbound", "inv_armor"), player -> player.inventory.armor);
+        SoulboundContainer.CONTAINERS.put(new Identifier("soulbound", "inv_main"), player -> player.getInventory().main);
+        SoulboundContainer.CONTAINERS.put(new Identifier("soulbound", "inv_off"), player -> player.getInventory().offHand);
+        SoulboundContainer.CONTAINERS.put(new Identifier("soulbound", "inv_armor"), player -> player.getInventory().armor);
         loadCompat("trinkets", "info.tehnut.soulbound.compat.CompatibilityTrinkets");
     }
 
