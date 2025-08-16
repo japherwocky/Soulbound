@@ -1,6 +1,7 @@
 package com.japherwocky.soulbound.enchantment;
 
 import com.japherwocky.soulbound.SoulboundPlugin;
+import io.papermc.paper.enchantments.EnchantmentRarity;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.set.RegistryKeySet;
 import io.papermc.paper.registry.set.RegistrySet;
@@ -8,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.EntityCategory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlotGroup;
@@ -16,7 +18,6 @@ import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Set;
 
 public class SoulboundEnchantment extends Enchantment {
@@ -53,12 +54,12 @@ public class SoulboundEnchantment extends Enchantment {
     }
 
     @Override
-    public boolean conflictsWith(Enchantment other) {
+    public boolean conflictsWith(@NotNull Enchantment other) {
         return false;
     }
 
     @Override
-    public boolean canEnchantItem(ItemStack item) {
+    public boolean canEnchantItem(@NotNull ItemStack item) {
         if (SoulboundPlugin.getInstance().allowOnAllItems()) {
             return true;
         }
@@ -89,7 +90,8 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
-        return RegistrySet.keySet(RegistryKey.ITEM_TYPE);
+        // Use the ITEM registry key
+        return RegistrySet.keySet(RegistryKey.ITEM);
     }
 
     @Override
@@ -116,50 +118,59 @@ public class SoulboundEnchantment extends Enchantment {
     public @NotNull RegistryKeySet<Enchantment> getExclusiveWith() {
         return RegistrySet.keySet(RegistryKey.ENCHANTMENT);
     }
-
-    /**
-     * @deprecated Use translationName() with a Component instead.
-     */
-    @Override
-    @Deprecated(forRemoval = true)
-    public @NotNull String translationKey() {
-        return "enchantment.soulbound.soulbound";
-    }
     
-    @Override
     public @NotNull Component translationName() {
         return Component.translatable("enchantment.soulbound.soulbound");
     }
     
     @Override
-    public @NotNull String getTranslationKey() {
+    public int getMinModifiedCost(int level) {
+        return 20;
+    }
+    
+    @Override
+    public int getMaxModifiedCost(int level) {
+        return 50;
+    }
+    
+    @Override
+    @SuppressWarnings("deprecation")
+    public @NotNull String translationKey() {
         return "enchantment.soulbound.soulbound";
     }
     
-    /**
-     * @deprecated Enchantments now have a complex effect systems that cannot be reduced to a simple damage increase.
-     */
     @Override
-    @Deprecated(forRemoval = true)
+    @SuppressWarnings("deprecation")
     public float getDamageIncrease(int level, EntityType entityType) {
         return 0.0f; // Soulbound doesn't increase damage
     }
     
-    /**
-     * @deprecated Enchantments now have a complex effect systems that cannot be reduced to a simple damage increase.
-     */
     @Override
-    @Deprecated(forRemoval = true)
+    @SuppressWarnings("deprecation")
     public float getDamageIncrease(int level, EntityCategory entityCategory) {
         return 0.0f; // Soulbound doesn't increase damage
     }
     
-    /**
-     * @deprecated As of 1.20.5 enchantments do not have a rarity.
-     */
     @Override
-    @Deprecated(forRemoval = true)
-    public EnchantmentRarity getRarity() {
+    @SuppressWarnings("deprecation")
+    public @NotNull EnchantmentRarity getRarity() {
         return EnchantmentRarity.RARE;
+    }
+    
+    @Override
+    @SuppressWarnings("deprecation")
+    public @NotNull EnchantmentTarget getItemTarget() {
+        return EnchantmentTarget.BREAKABLE;
+    }
+    
+    @Override
+    @SuppressWarnings("deprecation")
+    public @NotNull String getName() {
+        return "Soulbound";
+    }
+    
+    @Override
+    public @NotNull String getTranslationKey() {
+        return "enchantment.soulbound.soulbound";
     }
 }
