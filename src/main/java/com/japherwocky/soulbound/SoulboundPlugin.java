@@ -1,10 +1,10 @@
-package info.tehnut.soulbound;
+package com.japherwocky.soulbound;
 
-import info.tehnut.soulbound.api.SoulboundAPI;
-import info.tehnut.soulbound.enchantment.SoulboundEnchantment;
-import info.tehnut.soulbound.listeners.PlayerDeathListener;
-import info.tehnut.soulbound.listeners.PlayerRespawnListener;
-import info.tehnut.soulbound.persistence.SoulboundStorage;
+import com.japherwocky.soulbound.api.SoulboundAPI;
+import com.japherwocky.soulbound.enchantment.SoulboundEnchantment;
+import com.japherwocky.soulbound.listeners.PlayerDeathListener;
+import com.japherwocky.soulbound.listeners.PlayerRespawnListener;
+import com.japherwocky.soulbound.persistence.SoulboundStorage;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

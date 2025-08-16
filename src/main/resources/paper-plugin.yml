@@ -1,11 +1,11 @@
 name: Soulbound
 version: '${version}'
-main: info.tehnut.soulbound.SoulboundPlugin
+main: com.japherwocky.soulbound.SoulboundPlugin
 description: An enchantment that will retain items upon death
 api-version: '1.21'
-bootstrapper: info.tehnut.soulbound.SoulboundBootstrapper
-loader: info.tehnut.soulbound.SoulboundLoader
-authors: [TehNut, japherwocky]
+bootstrapper: com.japherwocky.soulbound.SoulboundBootstrapper
+loader: com.japherwocky.soulbound.SoulboundLoader
+authors: [japherwocky]
 website: https://github.com/japherwocky/Soulbound
 permissions:
   soulbound.command:

@@ -1,6 +1,6 @@
-package info.tehnut.soulbound.enchantment;
+package com.japherwocky.soulbound.enchantment;
 
-import info.tehnut.soulbound.SoulboundPlugin;
+import com.japherwocky.soulbound.SoulboundPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;

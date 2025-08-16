@@ -1,7 +1,7 @@
-package info.tehnut.soulbound.listeners;
+package com.japherwocky.soulbound.listeners;
 
-import info.tehnut.soulbound.SoulboundPlugin;
-import info.tehnut.soulbound.persistence.SoulboundStorage;
+import com.japherwocky.soulbound.SoulboundPlugin;
+import com.japherwocky.soulbound.persistence.SoulboundStorage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

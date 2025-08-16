@@ -1,4 +1,4 @@
-package info.tehnut.soulbound;
+package com.japherwocky.soulbound;
 
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;

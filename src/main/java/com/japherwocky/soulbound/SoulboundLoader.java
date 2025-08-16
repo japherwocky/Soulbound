@@ -1,4 +1,4 @@
-package info.tehnut.soulbound;
+package com.japherwocky.soulbound;
 
 import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
 import io.papermc.paper.plugin.loader.PluginLoader;

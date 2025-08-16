@@ -1,6 +1,6 @@
-package info.tehnut.soulbound.persistence;
+package com.japherwocky.soulbound.persistence;
 
-import info.tehnut.soulbound.SoulboundPlugin;
+import com.japherwocky.soulbound.SoulboundPlugin;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

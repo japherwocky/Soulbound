@@ -1,6 +1,6 @@
-package info.tehnut.soulbound.api;
+package com.japherwocky.soulbound.api;
 
-import info.tehnut.soulbound.SoulboundPlugin;
+import com.japherwocky.soulbound.SoulboundPlugin;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;

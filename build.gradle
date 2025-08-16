@@ -3,7 +3,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-group = 'info.tehnut.soulbound'
+group = 'com.japherwocky.soulbound'
 version = '1.0.0-SNAPSHOT'
 description = 'An enchantment that will retain items upon death'
 
