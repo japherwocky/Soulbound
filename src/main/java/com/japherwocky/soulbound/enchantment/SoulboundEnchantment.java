@@ -85,7 +85,7 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
-        return RegistryKeySet.all(ItemType.class);
+        return RegistryKeySet.allOf(ItemType.class);
     }
 
     @Override
@@ -110,11 +110,11 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public @NotNull RegistryKeySet<Enchantment> getExclusiveWith() {
-        return RegistryKeySet.none(Enchantment.class);
+        return RegistryKeySet.empty(Enchantment.class);
     }
 
     @Override
-    public @NotNull Component translationName() {
-        return Component.translatable("enchantment.soulbound.soulbound");
+    public @NotNull String translationKey() {
+        return "enchantment.soulbound.soulbound";
     }
 }
