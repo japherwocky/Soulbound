@@ -91,7 +91,7 @@ public class SoulboundEnchantment extends Enchantment {
     }
 
     @Override
-    public @Nullable RegistryKeySet<ItemType> getPrimaryItems() {
+    public @Nullable RegistrySet<ItemType> getPrimaryItems() {
         return null; // Use supported items
     }
 
