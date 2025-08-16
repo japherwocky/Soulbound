@@ -106,7 +106,7 @@ public class SoulboundPlugin extends JavaPlugin {
             soulboundEnchantment = new SoulboundEnchantment(enchantmentKey);
             
             // Register the enchantment using the Registry API
-            getServer().getRegistry().register(Enchantment.class, enchantmentKey, soulboundEnchantment);
+            getServer().getRegistry(Enchantment.class).register(enchantmentKey, soulboundEnchantment);
             
             getLogger().info("Successfully registered Soulbound enchantment!");
         } catch (Exception e) {

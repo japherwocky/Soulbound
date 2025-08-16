@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 public class SoulboundEnchantment extends Enchantment {
 
@@ -84,7 +85,7 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
-        return RegistryKeySet.allOf(ItemType.class);
+        return RegistryKeySet.all(ItemType.class);
     }
 
     @Override
@@ -103,17 +104,17 @@ public class SoulboundEnchantment extends Enchantment {
     }
 
     @Override
-    public @NotNull List<EquipmentSlotGroup> getActiveSlotGroups() {
-        return List.of(EquipmentSlotGroup.ARMOR, EquipmentSlotGroup.HAND);
+    public @NotNull Set<EquipmentSlotGroup> getActiveSlotGroups() {
+        return Set.of(EquipmentSlotGroup.ARMOR, EquipmentSlotGroup.HAND);
     }
 
     @Override
     public @NotNull RegistryKeySet<Enchantment> getExclusiveWith() {
-        return RegistryKeySet.empty(Enchantment.class);
+        return RegistryKeySet.none(Enchantment.class);
     }
 
     @Override
-    public @NotNull String translationKey() {
-        return "enchantment.soulbound.soulbound";
+    public @NotNull Component translationName() {
+        return Component.translatable("enchantment.soulbound.soulbound");
     }
 }
