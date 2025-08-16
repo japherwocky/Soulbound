@@ -13,7 +13,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import net.kyori.adventure.key.Key;
-import io.papermc.paper.registry.RegistryAccess;
+import org.bukkit.Registry;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -108,10 +108,23 @@ public class SoulboundPlugin extends JavaPlugin {
             soulboundEnchantment = new SoulboundEnchantment(enchantmentKey);
             
             // Register the enchantment using the Registry API
-            RegistryAccess.registryAccess().getRegistry(io.papermc.paper.registry.RegistryKey.ENCHANTMENT).register(
-                Key.key(enchantmentKey.getNamespace(), enchantmentKey.getKey()), 
-                soulboundEnchantment
-            );
+            // In Paper 1.21.4, we need to use the Bukkit Registry directly
+            try {
+                // Get the registry class
+                Class<?> registryClass = Class.forName("org.bukkit.Registry$SimpleRegistry");
+                
+                // Get the register method
+                java.lang.reflect.Method registerMethod = registryClass.getDeclaredMethod("register", Key.class, Object.class);
+                registerMethod.setAccessible(true);
+                
+                // Get the enchantment registry
+                Object registry = getServer().getRegistry(Enchantment.class);
+                
+                // Call the register method
+                registerMethod.invoke(registry, Key.key(enchantmentKey.getNamespace(), enchantmentKey.getKey()), soulboundEnchantment);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to register enchantment", e);
+            }
             
             getLogger().info("Successfully registered Soulbound enchantment!");
         } catch (Exception e) {
