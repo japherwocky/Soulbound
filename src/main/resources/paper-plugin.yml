@@ -1,0 +1,17 @@
+name: Soulbound
+version: '${version}'
+main: info.tehnut.soulbound.SoulboundPlugin
+description: An enchantment that will retain items upon death
+api-version: '1.21'
+bootstrapper: info.tehnut.soulbound.SoulboundBootstrapper
+loader: info.tehnut.soulbound.SoulboundLoader
+authors: [TehNut, japherwocky]
+website: https://github.com/japherwocky/Soulbound
+permissions:
+  soulbound.command:
+    description: Allows access to Soulbound commands
+    default: op
+  soulbound.enchant:
+    description: Allows applying the Soulbound enchantment
+    default: op
+
