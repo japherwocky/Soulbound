@@ -1,11 +1,13 @@
 package com.japherwocky.soulbound.enchantment;
 
 import com.japherwocky.soulbound.SoulboundPlugin;
-import io.papermc.paper.registry.set.RegistryKeySet;
+import io.papermc.paper.registry.set.RegistrySet;
+import io.papermc.paper.registry.RegistryKey;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
@@ -84,8 +86,8 @@ public class SoulboundEnchantment extends Enchantment {
     }
 
     @Override
-    public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
-        return RegistryKeySet.all(ItemType.class);
+    public @NotNull RegistrySet<ItemType> getSupportedItems() {
+        return RegistrySet.keySet(RegistryKey.ITEM, java.util.Collections.emptyList());
     }
 
     @Override
@@ -109,12 +111,17 @@ public class SoulboundEnchantment extends Enchantment {
     }
 
     @Override
-    public @NotNull RegistryKeySet<Enchantment> getExclusiveWith() {
-        return RegistryKeySet.none(Enchantment.class);
+    public @NotNull RegistrySet<Enchantment> getExclusiveWith() {
+        return RegistrySet.keySet(RegistryKey.ENCHANTMENT, java.util.Collections.emptyList());
     }
 
     @Override
     public @NotNull Component translationName() {
         return Component.translatable("enchantment.soulbound.soulbound");
+    }
+    
+    @Override
+    public double getDamageIncrease(int level, EntityType entityType) {
+        return 0.0; // Soulbound doesn't increase damage
     }
 }
