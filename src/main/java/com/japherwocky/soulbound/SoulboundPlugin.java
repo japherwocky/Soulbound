@@ -108,20 +108,13 @@ public class SoulboundPlugin extends JavaPlugin {
             soulboundEnchantment = new SoulboundEnchantment(enchantmentKey);
             
             // Register the enchantment using the Registry API
-            // In Paper 1.21.4, we need to use the Bukkit Registry directly
+            // In Paper 1.21.4, we need to use the updated Registry API
             try {
-                // Get the registry class
-                Class<?> registryClass = Class.forName("org.bukkit.Registry$SimpleRegistry");
-                
-                // Get the register method
-                java.lang.reflect.Method registerMethod = registryClass.getDeclaredMethod("register", Key.class, Object.class);
-                registerMethod.setAccessible(true);
-                
-                // Get the enchantment registry
-                Object registry = getServer().getRegistry(Enchantment.class);
-                
-                // Call the register method
-                registerMethod.invoke(registry, Key.key(enchantmentKey.getNamespace(), enchantmentKey.getKey()), soulboundEnchantment);
+                // Register the enchantment directly using the Registry API
+                getServer().getRegistry(Enchantment.class).register(
+                    enchantmentKey,
+                    soulboundEnchantment
+                );
             } catch (Exception e) {
                 throw new RuntimeException("Failed to register enchantment", e);
             }

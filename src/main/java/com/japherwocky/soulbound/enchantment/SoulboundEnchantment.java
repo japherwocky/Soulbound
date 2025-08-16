@@ -1,7 +1,9 @@
 package com.japherwocky.soulbound.enchantment;
 
 import com.japherwocky.soulbound.SoulboundPlugin;
+import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.set.RegistryKeySet;
+import io.papermc.paper.registry.set.RegistrySet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
@@ -87,7 +89,7 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
-        return RegistryKeySet.allOf(ItemType.class);
+        return RegistrySet.keySet(RegistryKey.ITEM_TYPE);
     }
 
     @Override
@@ -112,10 +114,14 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public @NotNull RegistryKeySet<Enchantment> getExclusiveWith() {
-        return RegistryKeySet.empty(Enchantment.class);
+        return RegistrySet.keySet(RegistryKey.ENCHANTMENT);
     }
 
+    /**
+     * @deprecated Use translationName() with a Component instead.
+     */
     @Override
+    @Deprecated(forRemoval = true)
     public @NotNull String translationKey() {
         return "enchantment.soulbound.soulbound";
     }
@@ -126,12 +132,34 @@ public class SoulboundEnchantment extends Enchantment {
     }
     
     @Override
+    public @NotNull String getTranslationKey() {
+        return "enchantment.soulbound.soulbound";
+    }
+    
+    /**
+     * @deprecated Enchantments now have a complex effect systems that cannot be reduced to a simple damage increase.
+     */
+    @Override
+    @Deprecated(forRemoval = true)
     public float getDamageIncrease(int level, EntityType entityType) {
         return 0.0f; // Soulbound doesn't increase damage
     }
     
+    /**
+     * @deprecated Enchantments now have a complex effect systems that cannot be reduced to a simple damage increase.
+     */
     @Override
+    @Deprecated(forRemoval = true)
     public float getDamageIncrease(int level, EntityCategory entityCategory) {
         return 0.0f; // Soulbound doesn't increase damage
+    }
+    
+    /**
+     * @deprecated As of 1.20.5 enchantments do not have a rarity.
+     */
+    @Override
+    @Deprecated(forRemoval = true)
+    public EnchantmentRarity getRarity() {
+        return EnchantmentRarity.RARE;
     }
 }
