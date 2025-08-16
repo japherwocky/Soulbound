@@ -5,7 +5,7 @@ Thank you for your interest in contributing to Soulbound! This document provides
 ## Development Environment Setup
 
 1. **Prerequisites**
-   - Java 17 or higher
+   - Java 21 or higher (required for Paper 1.21.4)
    - Git
    - Gradle 9.0.0 or use the included wrapper
 
@@ -90,4 +90,3 @@ Thank you for your interest in contributing to Soulbound! This document provides
 If you have any questions or need help, please open an issue on GitHub or contact the maintainers.
 
 Thank you for contributing to Soulbound!
-

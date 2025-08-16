@@ -4,7 +4,7 @@ This document provides detailed instructions for building the Soulbound plugin f
 
 ## Prerequisites
 
-- Java 17 or higher
+- Java 21 or higher (required for Paper 1.21.4)
 - Gradle 9.0.0 (recommended) or use the included wrapper
 
 ## Build Options
@@ -54,7 +54,7 @@ After a successful build, you'll find the plugin JAR file in the `build/libs` di
 ## Troubleshooting
 
 ### Java Version Issues
-Make sure you're using Java 17 or higher. You can check your Java version with:
+Make sure you're using Java 21 or higher. You can check your Java version with:
 ```
 java -version
 ```
@@ -88,4 +88,3 @@ To test the plugin:
 ## Continuous Integration
 
 For automated builds, we recommend using GitHub Actions. A sample workflow is included in the `.github/workflows` directory.
-
