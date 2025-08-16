@@ -1,26 +1,30 @@
 package com.japherwocky.soulbound.enchantment;
 
 import com.japherwocky.soulbound.SoulboundPlugin;
+import io.papermc.paper.registry.set.RegistryKeySet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.EntityCategory;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ItemType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
+import java.util.List;
 
 public class SoulboundEnchantment extends Enchantment {
 
+    private final NamespacedKey key;
+
     public SoulboundEnchantment(NamespacedKey key) {
-        super(key);
+        this.key = key;
     }
 
     @Override
-    public String getName() {
-        return "soulbound";
+    public @NotNull NamespacedKey getKey() {
+        return key;
     }
 
     @Override
@@ -31,11 +35,6 @@ public class SoulboundEnchantment extends Enchantment {
     @Override
     public int getStartLevel() {
         return 1;
-    }
-
-    @Override
-    public EnchantmentTarget getItemTarget() {
-        return EnchantmentTarget.ALL;
     }
 
     @Override
@@ -64,7 +63,7 @@ public class SoulboundEnchantment extends Enchantment {
     }
 
     @Override
-    public Component displayName(int level) {
+    public @NotNull Component displayName(int level) {
         return Component.text("Soulbound").color(NamedTextColor.GRAY);
     }
 
@@ -79,18 +78,42 @@ public class SoulboundEnchantment extends Enchantment {
     }
 
     @Override
-    public float getDamageIncrease(int level, EntityCategory entityCategory) {
-        return 0;
+    public @NotNull Component description() {
+        return Component.text("Keeps items in your inventory when you die").color(NamedTextColor.GRAY);
     }
 
     @Override
-    public Set<EquipmentSlot> getActiveSlots() {
-        return Set.of(EquipmentSlot.values());
+    public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
+        return RegistryKeySet.allOf(ItemType.class);
     }
 
     @Override
-    public String translationKey() {
+    public @Nullable RegistryKeySet<ItemType> getPrimaryItems() {
+        return null; // Use supported items
+    }
+
+    @Override
+    public int getWeight() {
+        return 1; // Rare enchantment
+    }
+
+    @Override
+    public int getAnvilCost() {
+        return 30;
+    }
+
+    @Override
+    public @NotNull List<EquipmentSlotGroup> getActiveSlotGroups() {
+        return List.of(EquipmentSlotGroup.ARMOR, EquipmentSlotGroup.HAND);
+    }
+
+    @Override
+    public @NotNull RegistryKeySet<Enchantment> getExclusiveWith() {
+        return RegistryKeySet.empty(Enchantment.class);
+    }
+
+    @Override
+    public @NotNull String translationKey() {
         return "enchantment.soulbound.soulbound";
     }
 }
-
