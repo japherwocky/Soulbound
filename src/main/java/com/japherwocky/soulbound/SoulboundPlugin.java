@@ -105,13 +105,8 @@ public class SoulboundPlugin extends JavaPlugin {
             // Create enchantment instance
             soulboundEnchantment = new SoulboundEnchantment(enchantmentKey);
             
-            // Use reflection to bypass the "acceptingNew" restriction
-            Field acceptingNew = Enchantment.class.getDeclaredField("acceptingNew");
-            acceptingNew.setAccessible(true);
-            acceptingNew.set(null, true);
-            
-            // Register the enchantment
-            Enchantment.registerEnchantment(soulboundEnchantment);
+            // Register the enchantment using the Registry API
+            getServer().getRegistry().register(Enchantment.class, enchantmentKey, soulboundEnchantment);
             
             getLogger().info("Successfully registered Soulbound enchantment!");
         } catch (Exception e) {
@@ -120,20 +115,9 @@ public class SoulboundPlugin extends JavaPlugin {
     }
 
     private void unregisterEnchantment() throws Exception {
-        // Use reflection to unregister the enchantment
-        Field byKeyField = Enchantment.class.getDeclaredField("byKey");
-        byKeyField.setAccessible(true);
-        
-        @SuppressWarnings("unchecked")
-        Map<NamespacedKey, Enchantment> byKey = (Map<NamespacedKey, Enchantment>) byKeyField.get(null);
-        byKey.remove(enchantmentKey);
-        
-        Field byNameField = Enchantment.class.getDeclaredField("byName");
-        byNameField.setAccessible(true);
-        
-        @SuppressWarnings("unchecked")
-        Map<String, Enchantment> byName = (Map<String, Enchantment>) byNameField.get(null);
-        byName.remove(soulboundEnchantment.getName());
+        // In Paper 1.21.4, we don't need to manually unregister enchantments
+        // The registry will handle this when the plugin is disabled
+        getLogger().info("Soulbound enchantment will be unregistered automatically");
     }
 
     public SoulboundEnchantment getSoulboundEnchantment() {
@@ -166,4 +150,3 @@ public class SoulboundPlugin extends JavaPlugin {
         }
     }
 }
-

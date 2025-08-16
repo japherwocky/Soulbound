@@ -1,11 +1,11 @@
 pluginManagement {
     repositories {
-        jcenter()
-        maven {
-            name = 'Fabric'
-            url = 'https://maven.fabricmc.net/'
-        }
+        mavenCentral()
         gradlePluginPortal()
+        maven {
+            name = 'Paper'
+            url = 'https://repo.papermc.io/repository/maven-public/'
+        }
     }
 }
 rootProject.name = 'Soulbound'
