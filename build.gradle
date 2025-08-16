@@ -21,6 +21,10 @@ repositories {
 
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+    
+    // Add test dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
 }
 
 java {
@@ -32,6 +36,7 @@ java {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.release = 21
+    options.compilerArgs += ['-Xlint:-deprecation', '-Xlint:-removal']
 }
 
 processResources {
@@ -58,5 +63,6 @@ shadowJar {
 }
 
 build {
-    dependsOn shadowJar
+    // Skip shadowJar for now
+    // dependsOn shadowJar
 }
