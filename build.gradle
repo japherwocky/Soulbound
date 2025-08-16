@@ -1,73 +1,54 @@
 plugins {
-    id 'fabric-loom' version '0.9-SNAPSHOT'
-    id "maven-publish"
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_1_8
-
-def build_number = System.getenv('BUILD_NUMBER') != null ? System.getenv('BUILD_NUMBER') : 'CUSTOM'
-
-group = package_group
-archivesBaseName = "${mod_name}-fabric"
-version = "${mc_version}-${mod_version}-${build_number}"
-
-minecraft {
-    refmapName = mod_name.toLowerCase() + '-refmap.json'
-}
+group = 'com.japherwocky.soulbound'
+version = '1.0.0-SNAPSHOT'
+description = 'An enchantment that will retain items upon death'
 
 repositories {
-	maven {
-		name = "TerraformersMC"
-		url = "https://maven.terraformersmc.com/"
-	}
-	maven {
-		name = "Ladysnake Libs"
-		url = "https://ladysnake.jfrog.io/artifactory/mods"
-	}
+    mavenCentral()
+    maven {
+        name = 'papermc-repo'
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${mc_version}"
-    mappings "net.fabricmc:yarn:${mc_version}+build.${mappings_version}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${api_version}"
-    modImplementation "dev.emi:trinkets:${trinkets_version}"
+    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
 }
 
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
-    classifier = 'sources'
-}
-
-task apiJar(type: Jar) {
-    from sourceSets.main.allSource
-    from sourceSets.main.output
-    include 'info/tehnut/soulbound/api/**/*'
-    classifier = 'api'
-}
-
-String getChangelogText() {
-    def changelogFile = new File('changelog.txt')
-    String str = ''
-    String separator = '---'
-    int lineCount = 0
-    boolean done = false
-    changelogFile.eachLine {
-        if (done || it == null) {
-            return
-        }
-        if (lineCount < 3) {
-            lineCount++
-            if (it.startsWith(separator)) {
-                return
-            }
-        }
-        if (!it.startsWith(separator)) {
-            str += "$it" + (lineCount < 3 ? ':\n\n' : '\n')
-            return
-        }
-        done = true // once we go past the first version block, parse no more
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
     }
-    return str
 }
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('paper-plugin.yml') {
+        expand props
+    }
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    minimize()
+}
+
+build {
+    dependsOn shadowJar
+}
+

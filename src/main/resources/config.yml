@@ -1,0 +1,15 @@
+# Soulbound Configuration
+
+# The chance (0.0 - 1.0) that the Soulbound enchantment will be removed from an item upon death
+# 0.0 = Never remove (default)
+# 0.5 = 50% chance to remove
+# 1.0 = Always remove
+soulbound-removal-chance: 0.0
+
+# Whether to allow the Soulbound enchantment on all items
+# If false, only items that can normally be enchanted (have durability) can receive the enchantment
+allow-on-all-items: true
+
+# Enable debug logging
+debug: false
+
