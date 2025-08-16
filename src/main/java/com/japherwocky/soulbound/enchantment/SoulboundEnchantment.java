@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityCategory;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
@@ -86,7 +87,7 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
-        return RegistryKeySet.all(ItemType.class);
+        return RegistryKeySet.allOf(ItemType.class);
     }
 
     @Override
@@ -111,7 +112,7 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public @NotNull RegistryKeySet<Enchantment> getExclusiveWith() {
-        return RegistryKeySet.none(Enchantment.class);
+        return RegistryKeySet.empty(Enchantment.class);
     }
 
     @Override
@@ -126,6 +127,11 @@ public class SoulboundEnchantment extends Enchantment {
     
     @Override
     public float getDamageIncrease(int level, EntityType entityType) {
+        return 0.0f; // Soulbound doesn't increase damage
+    }
+    
+    @Override
+    public float getDamageIncrease(int level, EntityCategory entityCategory) {
         return 0.0f; // Soulbound doesn't increase damage
     }
 }
