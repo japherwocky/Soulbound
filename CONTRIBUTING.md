@@ -1,75 +1,93 @@
 # Contributing to Soulbound
 
-Thank you for your interest in contributing to Soulbound! This document provides guidelines and instructions for contributing to this multi-platform Minecraft mod/plugin.
+Thank you for your interest in contributing to Soulbound! This document provides guidelines and instructions for contributing to this project.
 
-## Repository Structure
+## Development Environment Setup
 
-This repository is organized using branches to support multiple Minecraft versions and platforms:
+1. **Prerequisites**
+   - Java 17 or higher
+   - Git
+   - Gradle 9.0.0 or use the included wrapper
 
-```
-master (documentation, shared resources)
-├── mc-1.17/fabric-0.11.x
-├── mc-1.17/spigot-1.17.x
-└── ...
-```
-
-## Getting Started
-
-1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/Soulbound.git`
-3. Checkout the branch for the platform and Minecraft version you want to work on:
+2. **Clone the Repository**
    ```bash
-   git checkout mc-1.17/fabric-0.11.x  # or another branch
+   git clone https://github.com/japherwocky/Soulbound.git
+   cd Soulbound
    ```
-4. Create a new branch for your feature or bugfix:
+
+3. **Build the Project**
+   Using the Gradle wrapper:
+   ```bash
+   ./gradlew build
+   ```
+   
+   Or if you have Gradle 9.0.0 installed:
+   ```bash
+   gradle build
+   ```
+
+4. **Import into your IDE**
+   - For IntelliJ IDEA: File > Open > Select the build.gradle file
+   - For Eclipse: File > Import > Gradle > Existing Gradle Project
+
+## Making Changes
+
+1. **Create a Branch**
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
-## Making Changes
+2. **Make Your Changes**
+   - Follow the existing code style
+   - Add appropriate comments
+   - Update documentation if necessary
 
-### For All Platforms
+3. **Test Your Changes**
+   - Test on a local Paper server
+   - Ensure all existing functionality still works
+   - Add new tests if applicable
 
-- Follow the coding style of the platform you're working on
-- Write clear commit messages
-- Add tests for your changes when possible
-- Update documentation as needed
+4. **Commit Your Changes**
+   ```bash
+   git add .
+   git commit -m "Description of your changes"
+   ```
 
-### For Fabric
+5. **Push to GitHub**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
 
-- Follow the Fabric mod development guidelines
-- Test your changes with the Fabric loader
+6. **Create a Pull Request**
+   - Go to the repository on GitHub
+   - Click "New Pull Request"
+   - Select your branch
+   - Fill out the PR template
 
-### For Spigot/Paper
+## Code Style Guidelines
 
-- Follow the Bukkit/Spigot plugin development guidelines
-- Test your changes on a Spigot or Paper server
+- Use 4 spaces for indentation
+- Follow Java naming conventions
+- Keep methods small and focused
+- Add JavaDoc comments to public methods
+- Use meaningful variable and method names
 
-## Shared Resources
+## Testing
 
-Common resources like language files and assets are stored in the `common` directory on the master branch. If you need to update these:
+- Test your changes on Paper 1.21.x
+- Verify that the plugin loads correctly
+- Test all commands and features
+- Check for compatibility with other plugins
 
-1. Checkout the master branch
-2. Make your changes to the files in the `common` directory
-3. Commit and push your changes
-4. Create a pull request for the master branch
+## Documentation
 
-## Submitting Changes
+- Update README.md if you add new features
+- Add JavaDoc comments to new methods
+- Update config.yml comments if you change configuration options
 
-1. Push your changes to your fork
-2. Create a pull request against the appropriate branch (not master)
-3. Describe your changes in detail
-4. Reference any related issues
+## Questions?
 
-## Code Review
-
-All submissions require review. We use GitHub pull requests for this purpose.
-
-## Additional Resources
-
-- [Fabric Documentation](https://fabricmc.net/wiki/start)
-- [Spigot Plugin Development](https://www.spigotmc.org/wiki/spigot-plugin-development/)
-- [Bukkit JavaDocs](https://hub.spigotmc.org/javadocs/bukkit/)
+If you have any questions or need help, please open an issue on GitHub or contact the maintainers.
 
 Thank you for contributing to Soulbound!
 

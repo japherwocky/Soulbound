@@ -52,3 +52,7 @@ logs/
 # Server files
 server/
 
+# Gradle distribution in lib directory
+lib/gradle-*/
+# But keep the lib directory itself
+!lib/.gitkeep
