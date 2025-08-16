@@ -46,6 +46,15 @@ processResources {
 shadowJar {
     archiveClassifier.set('')
     minimize()
+    
+    // Configure the shadowJar task for Java 21 compatibility
+    doFirst {
+        // Ensure we're using the correct Java version
+        if (System.getenv('JAVA_HOME') != null) {
+            logger.lifecycle("Using JAVA_HOME: ${System.getenv('JAVA_HOME')}")
+            System.setProperty('org.gradle.java.home', System.getenv('JAVA_HOME'))
+        }
+    }
 }
 
 build {

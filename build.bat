@@ -1,6 +1,17 @@
 @echo off
 REM Build script for Soulbound plugin
 
+REM Check if Java is available and set JAVA_HOME if needed
+where java >nul 2>nul
+if %ERRORLEVEL% == 0 (
+    for /f "tokens=*" %%i in ('where java') do set JAVA_PATH=%%i
+    for %%i in ("%JAVA_PATH%") do set JAVA_BIN_DIR=%%~dpi
+    for %%i in ("%JAVA_BIN_DIR%..") do set JAVA_HOME=%%~fi
+    echo Using Java from: %JAVA_HOME%
+) else (
+    echo Warning: Java not found in PATH. Make sure JAVA_HOME is set correctly.
+)
+
 REM Check if Gradle is available in .\lib\gradle-9.0.0\bin
 if exist ".\lib\gradle-9.0.0\bin\gradle.bat" (
     echo Using Gradle 9.0.0 from .\lib directory
@@ -23,7 +34,7 @@ REM Check if Gradle is available on PATH
 
 REM Clean and build the project
 echo Building Soulbound plugin...
-%GRADLE_CMD% clean build
+%GRADLE_CMD% clean build --info
 
 REM Check if build was successful
 if %ERRORLEVEL% == 0 (
@@ -33,4 +44,3 @@ if %ERRORLEVEL% == 0 (
     echo Build failed. Please check the error messages above.
     exit /b 1
 )
-
