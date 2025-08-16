@@ -1,15 +1,21 @@
 @echo off
 REM Build script for Soulbound plugin
 
-REM Check if Java is available and set JAVA_HOME if needed
-where java >nul 2>nul
-if %ERRORLEVEL% == 0 (
-    for /f "tokens=*" %%i in ('where java') do set JAVA_PATH=%%i
-    for %%i in ("%JAVA_PATH%") do set JAVA_BIN_DIR=%%~dpi
-    for %%i in ("%JAVA_BIN_DIR%..") do set JAVA_HOME=%%~fi
-    echo Using Java from: %JAVA_HOME%
+REM Check if JAVA_HOME is already set
+if defined JAVA_HOME (
+    echo Using JAVA_HOME from environment: %JAVA_HOME%
 ) else (
-    echo Warning: Java not found in PATH. Make sure JAVA_HOME is set correctly.
+    REM Try to detect Java location if JAVA_HOME is not set
+    where java >nul 2>nul
+    if %ERRORLEVEL% == 0 (
+        for /f "tokens=*" %%i in ('where java') do set JAVA_PATH=%%i
+        for %%i in ("%JAVA_PATH%") do set JAVA_BIN_DIR=%%~dpi
+        for %%i in ("%JAVA_BIN_DIR%..") do set JAVA_HOME=%%~fi
+        echo Auto-detected Java at: %JAVA_HOME%
+    ) else (
+        echo Warning: Java not found in PATH and JAVA_HOME is not set.
+        echo Please set JAVA_HOME environment variable to your Java installation directory.
+    )
 )
 
 REM Check if Gradle is available in .\lib\gradle-9.0.0\bin
