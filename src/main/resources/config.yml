@@ -1,0 +1,13 @@
+# Soulbound Plugin Configuration
+
+# Chance for the Soulbound enchantment to be removed after death (0.0 to 1.0)
+# 0.0 = Never removed, 1.0 = Always removed
+soulbound-removal-chance: 0.0
+
+# Whether to allow the Soulbound enchantment to be applied to all items
+# If false, only items that can normally be enchanted can receive Soulbound
+allow-on-all-items: true
+
+# Debug mode - enables additional logging
+debug: false
+
