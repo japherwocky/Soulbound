@@ -53,9 +53,24 @@ public class EnchantmentTags {
         // Add to in_enchanting_table tag to make it available in the enchanting table
         tags.add(EnchantmentTagKeys.IN_ENCHANTING_TABLE);
         
-        // Add to discoverable tag to make it available in loot
-        // Create our own tag key since EnchantmentTagKeys.DISCOVERABLE is not available in this version
-        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:discoverable")));
+        // Add to tradeable tag to make it available from villager trades
+        tags.add(EnchantmentTagKeys.TRADEABLE);
+        
+        // Add to non_treasure tag to make it available in the enchanting table
+        tags.add(EnchantmentTagKeys.NON_TREASURE);
+        
+        // Add to on_random_loot tag to make it available in loot
+        tags.add(EnchantmentTagKeys.ON_RANDOM_LOOT);
+        
+        // Add to on_traded_equipment tag to make it available from villager trades
+        tags.add(EnchantmentTagKeys.ON_TRADED_EQUIPMENT);
+        
+        // Add to various village trades tags to make it available from different villager types
+        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:trades/plains_common")));
+        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:trades/desert_common")));
+        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:trades/savanna_common")));
+        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:trades/snow_common")));
+        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:trades/taiga_common")));
         
         return tags;
     }
