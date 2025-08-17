@@ -13,3 +13,8 @@ allow-on-all-items: true
 # Enable debug logging
 debug: false
 
+# Whether the Soulbound enchantment should be discoverable (appear in loot tables, fishing, etc.)
+discoverable: true
+
+# Whether the Soulbound enchantment should be tradeable (appear in villager trades)
+tradeable: true

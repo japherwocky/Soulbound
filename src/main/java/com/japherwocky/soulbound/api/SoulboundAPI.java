@@ -1,9 +1,13 @@
 package com.japherwocky.soulbound.api;
 
 import com.japherwocky.soulbound.SoulboundPlugin;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
 
 /**
  * Public API for interacting with the Soulbound enchantment.
@@ -86,5 +90,66 @@ public class SoulboundAPI {
     public static Enchantment getSoulboundEnchantment() {
         return plugin.getSoulboundEnchantment();
     }
+    
+    /**
+     * Creates an enchanted book with the Soulbound enchantment.
+     *
+     * @return An enchanted book with the Soulbound enchantment
+     */
+    public static ItemStack createSoulboundBook() {
+        try {
+            // Use the plugin's method to create the book
+            // This ensures we're using a consistent approach
+            return plugin.createSoulboundBook();
+        } catch (Exception e) {
+            if (plugin.isDebugEnabled()) {
+                plugin.debug("Error creating Soulbound book via API: " + e.getMessage());
+            }
+            // Return a regular book if we can't create an enchanted one
+            return new ItemStack(Material.BOOK);
+        }
+    }
+    
+    /**
+     * Creates an enchanted book with the Soulbound enchantment and custom name/lore.
+     *
+     * @param name The custom name for the book (can be null for default)
+     * @param lore The custom lore for the book (can be null for default)
+     * @return An enchanted book with the Soulbound enchantment and custom name/lore
+     */
+    public static ItemStack createSoulboundBook(String name, List<String> lore) {
+        try {
+            // Create the base book
+            ItemStack book = createSoulboundBook();
+            
+            // Add custom name and lore if provided
+            if (name != null || (lore != null && !lore.isEmpty())) {
+                ItemMeta meta = book.getItemMeta();
+                
+                if (meta != null) {
+                    if (name != null) {
+                        meta.setDisplayName(name);
+                    }
+                    
+                    if (lore != null && !lore.isEmpty()) {
+                        meta.setLore(lore);
+                    }
+                    
+                    book.setItemMeta(meta);
+                    
+                    if (plugin.isDebugEnabled()) {
+                        plugin.debug("Added custom name/lore to Soulbound book");
+                    }
+                }
+            }
+            
+            return book;
+        } catch (Exception e) {
+            if (plugin.isDebugEnabled()) {
+                plugin.debug("Error creating Soulbound book with custom name/lore: " + e.getMessage());
+            }
+            // Return a regular book if we can't create an enchanted one
+            return new ItemStack(Material.BOOK);
+        }
+    }
 }
-

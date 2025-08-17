@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.japherwocky.soulbound'
-version = '1.0.0-SNAPSHOT'
+version = '1.0.1'
 description = 'An enchantment that will retain items upon death'
 
 repositories {

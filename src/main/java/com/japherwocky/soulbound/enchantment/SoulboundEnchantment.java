@@ -45,7 +45,8 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public boolean isTreasure() {
-        return true;
+        // Setting to false to ensure it appears in creative inventory
+        return false;
     }
 
     @Override
@@ -75,12 +76,12 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public boolean isTradeable() {
-        return false;
+        return SoulboundPlugin.getInstance().isTradeable();
     }
 
     @Override
     public boolean isDiscoverable() {
-        return false;
+        return SoulboundPlugin.getInstance().isDiscoverable();
     }
 
     @Override
@@ -91,7 +92,8 @@ public class SoulboundEnchantment extends Enchantment {
     @Override
     public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
         // Use the ITEM registry key
-        return RegistrySet.keySet(RegistryKey.ITEM);
+        // Create a set of all item types
+        return RegistrySet.allOf(RegistryKey.ITEM);
     }
 
     @Override
