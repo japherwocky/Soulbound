@@ -3,8 +3,13 @@ package com.japherwocky.soulbound.enchantment;
 import com.japherwocky.soulbound.SoulboundPlugin;
 import io.papermc.paper.enchantments.EnchantmentRarity;
 import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
+import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
 import io.papermc.paper.registry.set.RegistryKeySet;
 import io.papermc.paper.registry.set.RegistrySet;
+import io.papermc.paper.registry.tag.TagKey;
+import io.papermc.paper.tag.TagEntry;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
@@ -18,14 +23,53 @@ import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("UnstableApiUsage")
 public class SoulboundEnchantment extends Enchantment {
 
+    public static final Key KEY = Key.key("soulbound:soulbound");
+    
     private final NamespacedKey key;
-
+    private final int anvilCost;
+    private final int weight;
+    private final EnchantmentRegistryEntry.EnchantmentCost minimumCost;
+    private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
+    private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
+    
     public SoulboundEnchantment(NamespacedKey key) {
         this.key = key;
+        this.anvilCost = 30;
+        this.weight = 1; // Rare enchantment
+        this.minimumCost = EnchantmentRegistryEntry.EnchantmentCost.of(20, 0);
+        this.maximumCost = EnchantmentRegistryEntry.EnchantmentCost.of(50, 0);
+        
+        // Add default supported item tags
+        List<String> defaultTags = List.of(
+            "#minecraft:enchantable/armor",
+            "#minecraft:enchantable/weapon",
+            "#minecraft:enchantable/mining",
+            "#minecraft:enchantable/fishing_rod",
+            "#minecraft:enchantable/trident",
+            "#minecraft:enchantable/wearable"
+        );
+        
+        for (String itemTag : defaultTags) {
+            if (itemTag.startsWith("#")) {
+                String tagName = itemTag.substring(1);
+                try {
+                    Key tagKey = Key.key(tagName);
+                    TagKey<ItemType> itemTypeTagKey = ItemTypeTagKeys.create(tagKey);
+                    TagEntry<ItemType> tagEntry = TagEntry.tagEntry(itemTypeTagKey);
+                    supportedItemTags.add(tagEntry);
+                } catch (IllegalArgumentException e) {
+                    SoulboundPlugin.getInstance().getLogger().warning("Invalid item tag: " + itemTag);
+                }
+            }
+        }
     }
 
     @Override
@@ -89,9 +133,8 @@ public class SoulboundEnchantment extends Enchantment {
     }
 
     @Override
-    public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
-        // Use the ITEM registry key
-        return RegistrySet.keySet(RegistryKey.ITEM);
+    public @NotNull Set<TagEntry<ItemType>> getSupportedItems() {
+        return Collections.unmodifiableSet(supportedItemTags);
     }
 
     @Override
@@ -101,17 +144,17 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public int getWeight() {
-        return 1; // Rare enchantment
+        return weight;
     }
 
     @Override
     public int getAnvilCost() {
-        return 30;
+        return anvilCost;
     }
 
     @Override
     public @NotNull Set<EquipmentSlotGroup> getActiveSlotGroups() {
-        return Set.of(EquipmentSlotGroup.ARMOR, EquipmentSlotGroup.HAND);
+        return Set.of(EquipmentSlotGroup.ANY);
     }
 
     @Override
@@ -124,13 +167,13 @@ public class SoulboundEnchantment extends Enchantment {
     }
     
     @Override
-    public int getMinModifiedCost(int level) {
-        return 20;
+    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMinimumCost() {
+        return minimumCost;
     }
     
     @Override
-    public int getMaxModifiedCost(int level) {
-        return 50;
+    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMaximumCost() {
+        return maximumCost;
     }
     
     @Override
@@ -172,5 +215,9 @@ public class SoulboundEnchantment extends Enchantment {
     @Override
     public @NotNull String getTranslationKey() {
         return "enchantment.soulbound.soulbound";
+    }
+    
+    public static TagKey<ItemType> getTagForSupportedItems() {
+        return TagKey.create(RegistryKey.ITEM, Key.key("soulbound:soulbound_enchantable"));
     }
 }

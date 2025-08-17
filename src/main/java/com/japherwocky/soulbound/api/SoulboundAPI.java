@@ -1,6 +1,10 @@
 package com.japherwocky.soulbound.api;
 
 import com.japherwocky.soulbound.SoulboundPlugin;
+import com.japherwocky.soulbound.enchantment.SoulboundEnchantment;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -8,9 +12,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 /**
  * Public API for interacting with the Soulbound enchantment.
  */
+@SuppressWarnings("UnstableApiUsage")
 public class SoulboundAPI {
 
     private static SoulboundPlugin plugin;
+    private static Enchantment soulboundEnchantment;
 
     /**
      * Initialize the API with the plugin instance.
@@ -20,6 +26,18 @@ public class SoulboundAPI {
      */
     public static void init(SoulboundPlugin plugin) {
         SoulboundAPI.plugin = plugin;
+        
+        // Get the enchantment from the registry if not already available
+        if (plugin.getSoulboundEnchantment() != null) {
+            soulboundEnchantment = plugin.getSoulboundEnchantment();
+        } else {
+            Registry<Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
+            soulboundEnchantment = registry.get(SoulboundEnchantment.KEY);
+            
+            if (soulboundEnchantment == null) {
+                plugin.getLogger().severe("Failed to get Soulbound enchantment from registry in API initialization!");
+            }
+        }
     }
 
     /**
@@ -29,12 +47,11 @@ public class SoulboundAPI {
      * @return true if the item has the Soulbound enchantment, false otherwise
      */
     public static boolean hasSoulbound(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) {
+        if (item == null || !item.hasItemMeta() || soulboundEnchantment == null) {
             return false;
         }
         
-        ItemMeta meta = item.getItemMeta();
-        return meta.hasEnchant(plugin.getSoulboundEnchantment());
+        return item.containsEnchantment(soulboundEnchantment);
     }
 
     /**
@@ -44,8 +61,8 @@ public class SoulboundAPI {
      * @return The modified item with the Soulbound enchantment
      */
     public static ItemStack addSoulbound(ItemStack item) {
-        if (item == null) {
-            return null;
+        if (item == null || soulboundEnchantment == null) {
+            return item;
         }
         
         ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : plugin.getServer().getItemFactory().getItemMeta(item.getType());
@@ -53,7 +70,7 @@ public class SoulboundAPI {
             return item;
         }
         
-        meta.addEnchant(plugin.getSoulboundEnchantment(), 1, true);
+        meta.addEnchant(soulboundEnchantment, 1, true);
         item.setItemMeta(meta);
         return item;
     }
@@ -65,13 +82,13 @@ public class SoulboundAPI {
      * @return The modified item without the Soulbound enchantment
      */
     public static ItemStack removeSoulbound(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) {
+        if (item == null || !item.hasItemMeta() || soulboundEnchantment == null) {
             return item;
         }
         
-        ItemMeta meta = item.getItemMeta();
-        if (meta.hasEnchant(plugin.getSoulboundEnchantment())) {
-            meta.removeEnchant(plugin.getSoulboundEnchantment());
+        if (item.containsEnchantment(soulboundEnchantment)) {
+            ItemMeta meta = item.getItemMeta();
+            meta.removeEnchant(soulboundEnchantment);
             item.setItemMeta(meta);
         }
         
@@ -84,7 +101,6 @@ public class SoulboundAPI {
      * @return The Soulbound enchantment
      */
     public static Enchantment getSoulboundEnchantment() {
-        return plugin.getSoulboundEnchantment();
+        return soulboundEnchantment;
     }
 }
-
