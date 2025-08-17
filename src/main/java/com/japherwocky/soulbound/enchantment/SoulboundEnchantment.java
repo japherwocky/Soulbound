@@ -92,7 +92,8 @@ public class SoulboundEnchantment extends Enchantment {
     @Override
     public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
         // Use the ITEM registry key
-        return RegistrySet.keySet(RegistryKey.ITEM);
+        // Create a set of all item types
+        return RegistrySet.allOf(RegistryKey.ITEM);
     }
 
     @Override
