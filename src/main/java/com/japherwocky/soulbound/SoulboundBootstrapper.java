@@ -9,8 +9,10 @@ import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.event.RegistryEvents;
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
+import io.papermc.paper.tag.TagEntry;
 import net.kyori.adventure.key.Key;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +37,17 @@ public class SoulboundBootstrapper implements PluginBootstrap {
             NamespacedKey key = new NamespacedKey("soulbound", "soulbound");
             SoulboundEnchantment enchantment = new SoulboundEnchantment(key);
             
-            // Register the tag
+            // Register the tag with standard enchantable items
             event.registrar().addToTag(
                     ItemTypeTagKeys.create(SoulboundEnchantment.getTagForSupportedItems().key()),
-                    enchantment.getSupportedItems()
+                    Set.of(
+                        TagEntry.tagEntry(ItemTypeTagKeys.ENCHANTABLE_ARMOR),
+                        TagEntry.tagEntry(ItemTypeTagKeys.ENCHANTABLE_WEAPON),
+                        TagEntry.tagEntry(ItemTypeTagKeys.ENCHANTABLE_MINING),
+                        TagEntry.tagEntry(ItemTypeTagKeys.ENCHANTABLE_CROSSBOW),
+                        TagEntry.tagEntry(ItemTypeTagKeys.ENCHANTABLE_BOW),
+                        TagEntry.tagEntry(ItemTypeTagKeys.ENCHANTABLE_TRIDENT)
+                    )
             );
         }));
         
