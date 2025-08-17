@@ -52,9 +52,9 @@ public class SoulboundEnchantment extends Enchantment {
             "#minecraft:enchantable/armor",
             "#minecraft:enchantable/weapon",
             "#minecraft:enchantable/mining",
-            "#minecraft:enchantable/fishing_rod",
-            "#minecraft:enchantable/trident",
-            "#minecraft:enchantable/wearable"
+            "#minecraft:enchantable/crossbow",
+            "#minecraft:enchantable/bow",
+            "#minecraft:enchantable/trident"
         );
         
         for (String itemTag : defaultTags) {
@@ -173,6 +173,16 @@ public class SoulboundEnchantment extends Enchantment {
     
     public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMaximumCost() {
         return maximumCost;
+    }
+    
+    @Override
+    public int getMinModifiedCost(int level) {
+        return 20;
+    }
+    
+    @Override
+    public int getMaxModifiedCost(int level) {
+        return 50;
     }
     
     @Override
