@@ -71,6 +71,10 @@ public class SoulboundBootstrapper implements PluginBootstrap {
                 builder.maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(50, 0));
                 builder.activeSlots(Set.of(EquipmentSlotGroup.ANY));
                 builder.supportedItems(event.getOrCreateTag(EnchantmentTags.getSoulboundSupportedItemsTag()));
+                // These properties are critical for the enchantment to appear in-game
+                builder.discoverable(true);
+                builder.tradeable(true);
+                builder.treasure(false);
             });
         }));
         

@@ -125,7 +125,7 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public boolean isDiscoverable() {
-        return true;
+        return true; // This is critical for the enchantment to appear in creative mode
     }
 
     @Override

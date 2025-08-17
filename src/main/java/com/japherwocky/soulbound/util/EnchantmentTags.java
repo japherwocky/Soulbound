@@ -65,6 +65,9 @@ public class EnchantmentTags {
         // Add to on_traded_equipment tag to make it available from villager trades
         tags.add(EnchantmentTagKeys.ON_TRADED_EQUIPMENT);
         
+        // Add to discoverable tag to make it available in creative mode and loot
+        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:discoverable")));
+        
         // Add to various village trades tags to make it available from different villager types
         tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:trades/plains_common")));
         tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:trades/desert_common")));
