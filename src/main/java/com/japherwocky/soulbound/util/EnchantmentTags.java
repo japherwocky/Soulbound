@@ -1,9 +1,16 @@
 package com.japherwocky.soulbound.util;
 
 import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.TypedKey;
+import io.papermc.paper.registry.keys.tags.EnchantmentTagKeys;
 import io.papermc.paper.registry.tag.TagKey;
+import io.papermc.paper.tag.TagEntry;
 import net.kyori.adventure.key.Key;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemType;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Utility class for enchantment tag-related functionality.
@@ -25,5 +32,30 @@ public class EnchantmentTags {
     public static TagKey<ItemType> getSoulboundSupportedItemsTag() {
         return TagKey.create(RegistryKey.ITEM, Key.key("soulbound:soulbound_enchantable"));
     }
+    
+    /**
+     * Gets the tag entry for the Soulbound enchantment.
+     * 
+     * @return The tag entry for the Soulbound enchantment
+     */
+    public static TagEntry<Enchantment> getSoulboundTagEntry() {
+        return TagEntry.valueEntry(TypedKey.create(RegistryKey.ENCHANTMENT, SOULBOUND_KEY));
+    }
+    
+    /**
+     * Gets the set of enchantment tag keys that the Soulbound enchantment should be registered with.
+     * 
+     * @return The set of enchantment tag keys
+     */
+    public static Set<TagKey<Enchantment>> getSoulboundEnchantmentTags() {
+        Set<TagKey<Enchantment>> tags = new HashSet<>();
+        
+        // Add to in_enchanting_table tag to make it available in the enchanting table
+        tags.add(EnchantmentTagKeys.IN_ENCHANTING_TABLE);
+        
+        // Add to discoverable tag to make it available in loot
+        tags.add(EnchantmentTagKeys.DISCOVERABLE);
+        
+        return tags;
+    }
 }
-

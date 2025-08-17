@@ -90,7 +90,7 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public boolean isTreasure() {
-        return true;
+        return false;
     }
 
     @Override
@@ -120,12 +120,12 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public boolean isTradeable() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isDiscoverable() {
-        return false;
+        return true;
     }
 
     @Override

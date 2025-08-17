@@ -17,6 +17,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -75,8 +76,17 @@ public class SoulboundBootstrapper implements PluginBootstrap {
         
         // Register enchantment tags
         context.getLifecycleManager().registerEventHandler(LifecycleEvents.TAGS.preFlatten(RegistryKey.ENCHANTMENT).newHandler((event) -> {
-            // Add the enchantment to the in_enchanting_table tag if desired
-            // For now, we'll keep it as a treasure enchantment
+            // Get the enchantment tags from our utility class
+            Set<TagKey<Enchantment>> enchantmentTags = EnchantmentTags.getSoulboundEnchantmentTags();
+            
+            // Get the tag entry for our enchantment
+            TagEntry<Enchantment> soulboundTagEntry = EnchantmentTags.getSoulboundTagEntry();
+            
+            // Register our enchantment with each tag
+            for (TagKey<Enchantment> tagKey : enchantmentTags) {
+                logger.info("Registering enchantment tag {} for Soulbound", tagKey.key());
+                event.registrar().addToTag(tagKey, Set.of(soulboundTagEntry));
+            }
         }));
     }
 
