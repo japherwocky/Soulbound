@@ -263,17 +263,10 @@ public class SoulboundPlugin extends JavaPlugin {
             if (book.getItemMeta() instanceof org.bukkit.inventory.meta.EnchantmentStorageMeta meta) {
                 meta.addStoredEnchant(registeredEnchantment, 1, true);
                 book.setItemMeta(meta);
-                debug("Created Soulbound enchanted book manually: " + book);
+                debug("Created Soulbound enchanted book: " + book);
             } else {
                 debug("Failed to get EnchantmentStorageMeta from book");
-                // Try using the ItemFactory method as a fallback
-                try {
-                    book = getServer().getItemFactory().enchantBook(registeredEnchantment, 1);
-                    debug("Created Soulbound enchanted book using ItemFactory: " + book);
-                } catch (Exception e) {
-                    debug("ItemFactory.enchantBook failed: " + e.getMessage());
-                    throw e; // Re-throw to be caught by outer try-catch
-                }
+                throw new IllegalStateException("Could not get EnchantmentStorageMeta from book");
             }
             
             return book;
