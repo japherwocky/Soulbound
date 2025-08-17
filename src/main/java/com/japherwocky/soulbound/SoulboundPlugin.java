@@ -157,29 +157,15 @@ public class SoulboundPlugin extends JavaPlugin {
             // Create our custom enchantment instance
             soulboundEnchantment = new SoulboundEnchantment(enchantmentKey);
             
-            // Register the enchantment with Bukkit
-            try {
-                // Use reflection to register the enchantment
-                // This is a workaround since Paper 1.21.4 doesn't have a direct API for registering enchantments
-                java.lang.reflect.Field f = org.bukkit.enchantments.Enchantment.class.getDeclaredField("acceptingNew");
-                f.setAccessible(true);
-                f.set(null, true);
-                org.bukkit.enchantments.Enchantment.registerEnchantment(soulboundEnchantment);
-                f.set(null, false);
-                getLogger().info("Successfully registered Soulbound enchantment!");
-            } catch (IllegalArgumentException e) {
-                if (e.getMessage().contains("Cannot set already-set enchantment")) {
-                    // Enchantment is already registered, which is fine
-                    getLogger().info("Soulbound enchantment was already registered");
-                    
-                    // Get the registered enchantment
-                    Enchantment registeredEnchantment = Enchantment.getByKey(enchantmentKey);
-                    if (registeredEnchantment != null) {
-                        soulboundEnchantment = (SoulboundEnchantment) registeredEnchantment;
-                    }
-                } else {
-                    throw e;
-                }
+            // In Paper 1.21.8, we don't need to manually register the enchantment
+            // The registry API will handle this for us
+            getLogger().info("Successfully created Soulbound enchantment!");
+            
+            // Get the registered enchantment
+            Enchantment registeredEnchantment = Enchantment.getByKey(enchantmentKey);
+            if (registeredEnchantment != null) {
+                getLogger().info("Soulbound enchantment was already registered in Bukkit");
+                soulboundEnchantment = (SoulboundEnchantment) registeredEnchantment;
             }
             
             // Log enchantment details
