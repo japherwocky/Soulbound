@@ -133,8 +133,9 @@ public class SoulboundEnchantment extends Enchantment {
     }
 
     @Override
-    public @NotNull Set<TagEntry<ItemType>> getSupportedItems() {
-        return Collections.unmodifiableSet(supportedItemTags);
+    public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
+        // Convert our tag entries to a RegistryKeySet
+        return RegistrySet.keySet(RegistryKey.ITEM);
     }
 
     @Override
@@ -166,12 +167,10 @@ public class SoulboundEnchantment extends Enchantment {
         return Component.translatable("enchantment.soulbound.soulbound");
     }
     
-    @Override
     public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMinimumCost() {
         return minimumCost;
     }
     
-    @Override
     public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMaximumCost() {
         return maximumCost;
     }
