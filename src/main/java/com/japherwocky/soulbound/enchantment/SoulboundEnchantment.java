@@ -45,7 +45,8 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public boolean isTreasure() {
-        return true;
+        // Setting to false to ensure it appears in creative inventory
+        return false;
     }
 
     @Override

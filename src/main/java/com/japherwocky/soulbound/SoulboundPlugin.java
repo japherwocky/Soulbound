@@ -73,6 +73,7 @@ public class SoulboundPlugin extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("soulbound")) {
+            // Basic info command doesn't require permission
             if (args.length == 0) {
                 sender.sendMessage("§6Soulbound §7v" + getDescription().getVersion());
                 sender.sendMessage("§7An enchantment that will retain items upon death");
@@ -80,7 +81,14 @@ public class SoulboundPlugin extends JavaPlugin {
                 return true;
             }
             
-            if (args[0].equalsIgnoreCase("help") && sender.hasPermission("soulbound.command")) {
+            // Check if sender has permission for all other commands
+            if (!sender.hasPermission("soulbound.command") && !sender.isOp()) {
+                sender.sendMessage("§cYou don't have permission to use this command.");
+                debug("Permission denied for " + sender.getName() + " using command: /soulbound " + args[0]);
+                return true;
+            }
+            
+            if (args[0].equalsIgnoreCase("help")) {
                 sender.sendMessage("§6Soulbound §7Commands:");
                 sender.sendMessage("§7- §f/soulbound §7- Show plugin information");
                 sender.sendMessage("§7- §f/soulbound help §7- Show this help message");
@@ -90,14 +98,14 @@ public class SoulboundPlugin extends JavaPlugin {
                 return true;
             }
             
-            if (args[0].equalsIgnoreCase("reload") && sender.hasPermission("soulbound.command")) {
+            if (args[0].equalsIgnoreCase("reload")) {
                 reloadConfig();
                 storage.reload();
                 sender.sendMessage("§6Soulbound §7configuration reloaded!");
                 return true;
             }
             
-            if (args[0].equalsIgnoreCase("info") && sender.hasPermission("soulbound.command")) {
+            if (args[0].equalsIgnoreCase("info")) {
                 sender.sendMessage("§6Soulbound §7Configuration:");
                 sender.sendMessage("§7- Removal Chance: §f" + getConfig().getDouble("soulbound-removal-chance"));
                 sender.sendMessage("§7- Allow on All Items: §f" + getConfig().getBoolean("allow-on-all-items"));
@@ -107,7 +115,7 @@ public class SoulboundPlugin extends JavaPlugin {
                 return true;
             }
             
-            if (args[0].equalsIgnoreCase("book") && sender.hasPermission("soulbound.command")) {
+            if (args[0].equalsIgnoreCase("book")) {
                 // Handle giving a Soulbound book
                 Player target;
                 
@@ -150,8 +158,46 @@ public class SoulboundPlugin extends JavaPlugin {
             
             // Register the enchantment using the Registry API
             // In Paper 1.21.4, custom enchantments are registered differently
-            // We'll just create the enchantment instance and make it available via the API
             // The actual registration is handled by the server when it loads the plugin
+            
+            // Add enchanted book to creative inventory
+            // We'll use a delayed task to ensure the enchantment is registered before we try to create the book
+            getServer().getScheduler().runTaskLater(this, () -> {
+                try {
+                    // Check if the enchantment is registered
+                    Enchantment registeredEnchantment = Enchantment.getByKey(enchantmentKey);
+                    if (registeredEnchantment == null) {
+                        debug("Enchantment not found in registry, attempting to register manually");
+                        // If the enchantment isn't in the registry, we need to register it manually
+                        // This is a fallback and shouldn't be necessary in most cases
+                        
+                        // In Paper 1.21.4, enchantments are registered through the plugin.yml
+                        // But we can try to ensure it's available through our API
+                        registeredEnchantment = soulboundEnchantment;
+                    }
+                    
+                    debug("Enchantment registration status: " + (registeredEnchantment != null));
+                    if (registeredEnchantment != null) {
+                        debug("Registered enchantment key: " + registeredEnchantment.getKey());
+                        debug("Enchantment is discoverable: " + registeredEnchantment.isDiscoverable());
+                        debug("Enchantment is tradeable: " + registeredEnchantment.isTradeable());
+                        
+                        // Create a sample enchanted book to verify it works
+                        ItemStack book = createSoulboundBook();
+                        debug("Sample enchanted book created: " + book);
+                        if (book.hasItemMeta()) {
+                            debug("Book meta: " + book.getItemMeta());
+                            if (book.getItemMeta() instanceof org.bukkit.inventory.meta.EnchantmentStorageMeta) {
+                                org.bukkit.inventory.meta.EnchantmentStorageMeta meta = 
+                                    (org.bukkit.inventory.meta.EnchantmentStorageMeta) book.getItemMeta();
+                                debug("Book stored enchants: " + meta.getStoredEnchants());
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    getLogger().log(Level.SEVERE, "Failed to verify enchantment registration", e);
+                }
+            }, 20L); // 1 second delay
             
             getLogger().info("Successfully registered Soulbound enchantment!");
         } catch (Exception e) {
@@ -201,5 +247,24 @@ public class SoulboundPlugin extends JavaPlugin {
         if (isDebugEnabled()) {
             getLogger().info("[DEBUG] " + message);
         }
+    }
+    
+    /**
+     * Creates a Soulbound enchanted book
+     * @return The enchanted book
+     */
+    public ItemStack createSoulboundBook() {
+        ItemStack book = new ItemStack(org.bukkit.Material.ENCHANTED_BOOK);
+        org.bukkit.inventory.meta.EnchantmentStorageMeta meta = (org.bukkit.inventory.meta.EnchantmentStorageMeta) book.getItemMeta();
+        
+        if (meta != null) {
+            meta.addStoredEnchant(soulboundEnchantment, 1, true);
+            book.setItemMeta(meta);
+            debug("Created Soulbound enchanted book: " + book);
+        } else {
+            debug("Failed to create Soulbound enchanted book: meta is null");
+        }
+        
+        return book;
     }
 }

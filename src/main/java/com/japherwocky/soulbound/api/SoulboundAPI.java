@@ -101,8 +101,23 @@ public class SoulboundAPI {
         EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
         
         if (meta != null) {
-            meta.addStoredEnchant(plugin.getSoulboundEnchantment(), 1, true);
+            Enchantment enchantment = plugin.getSoulboundEnchantment();
+            if (plugin.isDebugEnabled()) {
+                plugin.debug("Creating Soulbound book with enchantment: " + enchantment);
+                plugin.debug("Enchantment key: " + enchantment.getKey());
+                plugin.debug("Enchantment is discoverable: " + enchantment.isDiscoverable());
+                plugin.debug("Enchantment is tradeable: " + enchantment.isTradeable());
+            }
+            
+            meta.addStoredEnchant(enchantment, 1, true);
             book.setItemMeta(meta);
+            
+            if (plugin.isDebugEnabled()) {
+                plugin.debug("Created Soulbound book: " + book);
+                plugin.debug("Book meta: " + book.getItemMeta());
+            }
+        } else if (plugin.isDebugEnabled()) {
+            plugin.debug("Failed to create Soulbound book: meta is null");
         }
         
         return book;
