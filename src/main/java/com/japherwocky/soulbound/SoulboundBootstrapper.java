@@ -36,7 +36,23 @@ public class SoulboundBootstrapper implements PluginBootstrap {
         // Bootstrap logic - runs before the server starts
         logger.info("Bootstrapping Soulbound plugin");
         
-        // Register the item tag for supported items
+        // STEP 1: Register enchantment tags FIRST (following Enchantio's order)
+        // This is critical for the enchantment to be properly registered with all tags
+        context.getLifecycleManager().registerEventHandler(LifecycleEvents.TAGS.preFlatten(RegistryKey.ENCHANTMENT).newHandler((event) -> {
+            // Get the enchantment tags from our utility class
+            Set<TagKey<Enchantment>> enchantmentTags = EnchantmentTags.getSoulboundEnchantmentTags();
+            
+            // Get the tag entry for our enchantment
+            TagEntry<Enchantment> soulboundTagEntry = EnchantmentTags.getSoulboundTagEntry();
+            
+            // Register our enchantment with each tag
+            for (TagKey<Enchantment> tagKey : enchantmentTags) {
+                logger.info("Registering enchantment tag {} for Soulbound", tagKey.key());
+                event.registrar().addToTag(tagKey, Set.of(soulboundTagEntry));
+            }
+        }));
+        
+        // STEP 2: Register the item tag for supported items
         context.getLifecycleManager().registerEventHandler(LifecycleEvents.TAGS.preFlatten(RegistryKey.ITEM).newHandler((event) -> {
             // Get the tag key from our utility class to avoid loading the Enchantment class
             TagKey<ItemType> supportedItemsTag = EnchantmentTags.getSoulboundSupportedItemsTag();
@@ -56,7 +72,7 @@ public class SoulboundBootstrapper implements PluginBootstrap {
             );
         }));
         
-        // Register the enchantment
+        // STEP 3: Register the enchantment LAST (following Enchantio's order)
         context.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.freeze().newHandler(event -> {
             logger.info("Registering Soulbound enchantment");
             
@@ -71,24 +87,9 @@ public class SoulboundBootstrapper implements PluginBootstrap {
                 builder.maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(50, 0));
                 builder.activeSlots(Set.of(EquipmentSlotGroup.ANY));
                 builder.supportedItems(event.getOrCreateTag(EnchantmentTags.getSoulboundSupportedItemsTag()));
-                // These properties are controlled through tags in the tag registration phase
-                // We don't need to set them here as they're handled in the EnchantmentTags utility class
+                // Note: The discoverable, tradeable, and treasure properties are set via tags
+                // in the EnchantmentTags.getSoulboundEnchantmentTags() method
             });
-        }));
-        
-        // Register enchantment tags
-        context.getLifecycleManager().registerEventHandler(LifecycleEvents.TAGS.preFlatten(RegistryKey.ENCHANTMENT).newHandler((event) -> {
-            // Get the enchantment tags from our utility class
-            Set<TagKey<Enchantment>> enchantmentTags = EnchantmentTags.getSoulboundEnchantmentTags();
-            
-            // Get the tag entry for our enchantment
-            TagEntry<Enchantment> soulboundTagEntry = EnchantmentTags.getSoulboundTagEntry();
-            
-            // Register our enchantment with each tag
-            for (TagKey<Enchantment> tagKey : enchantmentTags) {
-                logger.info("Registering enchantment tag {} for Soulbound", tagKey.key());
-                event.registrar().addToTag(tagKey, Set.of(soulboundTagEntry));
-            }
         }));
     }
 
@@ -98,3 +99,4 @@ public class SoulboundBootstrapper implements PluginBootstrap {
         return new SoulboundPlugin();
     }
 }
+
