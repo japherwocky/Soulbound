@@ -35,17 +35,10 @@ public class SoulboundBootstrapper implements PluginBootstrap {
             NamespacedKey key = new NamespacedKey("soulbound", "soulbound");
             SoulboundEnchantment enchantment = new SoulboundEnchantment(key);
             
-            // Register the tag - use default enchantable items
+            // Register the tag
             event.registrar().addToTag(
                     ItemTypeTagKeys.create(SoulboundEnchantment.getTagForSupportedItems().key()),
-                    Set.of(
-                        ItemTypeTagKeys.ENCHANTABLE_ARMOR,
-                        ItemTypeTagKeys.ENCHANTABLE_WEAPON,
-                        ItemTypeTagKeys.ENCHANTABLE_MINING,
-                        ItemTypeTagKeys.ENCHANTABLE_FISHING_ROD,
-                        ItemTypeTagKeys.ENCHANTABLE_TRIDENT,
-                        ItemTypeTagKeys.ENCHANTABLE_WEARABLE
-                    )
+                    enchantment.getSupportedItems()
             );
         }));
         
