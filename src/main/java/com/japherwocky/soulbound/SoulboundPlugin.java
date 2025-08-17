@@ -248,8 +248,7 @@ public class SoulboundPlugin extends JavaPlugin {
      */
     public ItemStack createSoulboundBook() {
         try {
-            // Use the Bukkit API to create an enchanted book
-            // This avoids ClassCastException with custom enchantments
+            // Create an enchanted book
             ItemStack book = new ItemStack(org.bukkit.Material.ENCHANTED_BOOK);
             
             // Get the enchantment from the registry instead of using our custom instance directly
@@ -260,11 +259,23 @@ public class SoulboundPlugin extends JavaPlugin {
                 registeredEnchantment = soulboundEnchantment;
             }
             
-            // Use the Bukkit API to add the enchantment to the book
-            // This is safer than directly manipulating the meta
-            book = getServer().getItemFactory().enchantBook(registeredEnchantment, 1);
+            // Add the enchantment to the book's meta directly
+            if (book.getItemMeta() instanceof org.bukkit.inventory.meta.EnchantmentStorageMeta meta) {
+                meta.addStoredEnchant(registeredEnchantment, 1, true);
+                book.setItemMeta(meta);
+                debug("Created Soulbound enchanted book manually: " + book);
+            } else {
+                debug("Failed to get EnchantmentStorageMeta from book");
+                // Try using the ItemFactory method as a fallback
+                try {
+                    book = getServer().getItemFactory().enchantBook(registeredEnchantment, 1);
+                    debug("Created Soulbound enchanted book using ItemFactory: " + book);
+                } catch (Exception e) {
+                    debug("ItemFactory.enchantBook failed: " + e.getMessage());
+                    throw e; // Re-throw to be caught by outer try-catch
+                }
+            }
             
-            debug("Created Soulbound enchanted book using Bukkit API: " + book);
             return book;
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Failed to create Soulbound book", e);
