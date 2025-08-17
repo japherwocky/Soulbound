@@ -33,10 +33,10 @@ soulbound-removal-chance: 0.0
 allow-on-all-items: true
 
 # Whether the Soulbound enchantment should be discoverable (appear in loot tables, fishing, etc.)
-discoverable: false
+discoverable: true
 
 # Whether the Soulbound enchantment should be tradeable (appear in villager trades)
-tradeable: false
+tradeable: true
 
 # Enable debug logging
 debug: false

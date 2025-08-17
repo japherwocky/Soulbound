@@ -190,11 +190,11 @@ public class SoulboundPlugin extends JavaPlugin {
     }
 
     public boolean isDiscoverable() {
-        return getConfig().getBoolean("discoverable", false);
+        return getConfig().getBoolean("discoverable", true);
     }
 
     public boolean isTradeable() {
-        return getConfig().getBoolean("tradeable", false);
+        return getConfig().getBoolean("tradeable", true);
     }
 
     public void debug(String message) {
