@@ -10,6 +10,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Level;
@@ -74,6 +76,17 @@ public class SoulboundPlugin extends JavaPlugin {
             if (args.length == 0) {
                 sender.sendMessage("§6Soulbound §7v" + getDescription().getVersion());
                 sender.sendMessage("§7An enchantment that will retain items upon death");
+                sender.sendMessage("§7Use §f/soulbound help §7for available commands");
+                return true;
+            }
+            
+            if (args[0].equalsIgnoreCase("help") && sender.hasPermission("soulbound.command")) {
+                sender.sendMessage("§6Soulbound §7Commands:");
+                sender.sendMessage("§7- §f/soulbound §7- Show plugin information");
+                sender.sendMessage("§7- §f/soulbound help §7- Show this help message");
+                sender.sendMessage("§7- §f/soulbound reload §7- Reload the configuration");
+                sender.sendMessage("§7- §f/soulbound info §7- Show configuration information");
+                sender.sendMessage("§7- §f/soulbound book [player] §7- Give a Soulbound book to a player");
                 return true;
             }
             
@@ -88,7 +101,42 @@ public class SoulboundPlugin extends JavaPlugin {
                 sender.sendMessage("§6Soulbound §7Configuration:");
                 sender.sendMessage("§7- Removal Chance: §f" + getConfig().getDouble("soulbound-removal-chance"));
                 sender.sendMessage("§7- Allow on All Items: §f" + getConfig().getBoolean("allow-on-all-items"));
+                sender.sendMessage("§7- Discoverable: §f" + getConfig().getBoolean("discoverable"));
+                sender.sendMessage("§7- Tradeable: §f" + getConfig().getBoolean("tradeable"));
                 sender.sendMessage("§7- Debug Mode: §f" + getConfig().getBoolean("debug"));
+                return true;
+            }
+            
+            if (args[0].equalsIgnoreCase("book") && sender.hasPermission("soulbound.command")) {
+                // Handle giving a Soulbound book
+                Player target;
+                
+                if (args.length > 1) {
+                    // Give to specified player
+                    target = getServer().getPlayer(args[1]);
+                    if (target == null) {
+                        sender.sendMessage("§cPlayer not found: §f" + args[1]);
+                        return true;
+                    }
+                } else if (sender instanceof Player) {
+                    // Give to command sender
+                    target = (Player) sender;
+                } else {
+                    sender.sendMessage("§cUsage: §f/soulbound book [player]");
+                    return true;
+                }
+                
+                // Create and give the book
+                ItemStack book = SoulboundAPI.createSoulboundBook();
+                target.getInventory().addItem(book);
+                
+                if (target == sender) {
+                    sender.sendMessage("§6Soulbound §7book added to your inventory!");
+                } else {
+                    sender.sendMessage("§6Soulbound §7book given to §f" + target.getName());
+                    target.sendMessage("§6Soulbound §7book added to your inventory!");
+                }
+                
                 return true;
             }
         }
@@ -139,6 +187,14 @@ public class SoulboundPlugin extends JavaPlugin {
 
     public boolean isDebugEnabled() {
         return getConfig().getBoolean("debug", false);
+    }
+
+    public boolean isDiscoverable() {
+        return getConfig().getBoolean("discoverable", false);
+    }
+
+    public boolean isTradeable() {
+        return getConfig().getBoolean("tradeable", false);
     }
 
     public void debug(String message) {

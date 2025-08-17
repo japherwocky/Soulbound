@@ -75,12 +75,12 @@ public class SoulboundEnchantment extends Enchantment {
 
     @Override
     public boolean isTradeable() {
-        return false;
+        return SoulboundPlugin.getInstance().isTradeable();
     }
 
     @Override
     public boolean isDiscoverable() {
-        return false;
+        return SoulboundPlugin.getInstance().isDiscoverable();
     }
 
     @Override

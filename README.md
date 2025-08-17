@@ -12,6 +12,8 @@ Soulbound is a Paper plugin that adds a new enchantment to Minecraft. When an it
 - Items with this enchantment are kept in inventory on death
 - Configurable chance for the enchantment to be removed on death
 - Option to allow the enchantment on all items or only enchantable items
+- Enchanted books with the Soulbound enchantment
+- Options to make the enchantment discoverable and tradeable
 - API for other plugins to interact with Soulbound items
 
 ## Installation
@@ -30,6 +32,12 @@ soulbound-removal-chance: 0.0
 # Whether to allow the Soulbound enchantment on all items
 allow-on-all-items: true
 
+# Whether the Soulbound enchantment should be discoverable (appear in loot tables, fishing, etc.)
+discoverable: false
+
+# Whether the Soulbound enchantment should be tradeable (appear in villager trades)
+tradeable: false
+
 # Enable debug logging
 debug: false
 ```
@@ -37,8 +45,10 @@ debug: false
 ## Commands
 
 - `/soulbound` - Shows plugin information
+- `/soulbound help` - Shows available commands (requires `soulbound.command` permission)
 - `/soulbound reload` - Reloads the configuration (requires `soulbound.command` permission)
 - `/soulbound info` - Shows current configuration settings (requires `soulbound.command` permission)
+- `/soulbound book [player]` - Gives a Soulbound enchanted book to a player (requires `soulbound.command` permission)
 
 ## Permissions
 
@@ -61,6 +71,14 @@ ItemStack normalItem = SoulboundAPI.removeSoulbound(itemStack);
 
 // Get the Soulbound enchantment instance
 Enchantment soulboundEnchantment = SoulboundAPI.getSoulboundEnchantment();
+
+// Create a Soulbound enchanted book
+ItemStack soulboundBook = SoulboundAPI.createSoulboundBook();
+
+// Create a Soulbound enchanted book with custom name and lore
+List<String> lore = new ArrayList<>();
+lore.add("A mystical book that binds items to your soul");
+ItemStack customSoulboundBook = SoulboundAPI.createSoulboundBook("§6Tome of Soul Binding", lore);
 ```
 
 ## Building from Source
@@ -84,4 +102,3 @@ This project is in the public domain.
 ## Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
