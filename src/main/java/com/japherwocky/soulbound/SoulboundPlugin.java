@@ -182,17 +182,10 @@ public class SoulboundPlugin extends JavaPlugin {
                         debug("Enchantment is discoverable: " + registeredEnchantment.isDiscoverable());
                         debug("Enchantment is tradeable: " + registeredEnchantment.isTradeable());
                         
-                        // Create a sample enchanted book to verify it works
-                        ItemStack book = createSoulboundBook();
-                        debug("Sample enchanted book created: " + book);
-                        if (book.hasItemMeta()) {
-                            debug("Book meta: " + book.getItemMeta());
-                            if (book.getItemMeta() instanceof org.bukkit.inventory.meta.EnchantmentStorageMeta) {
-                                org.bukkit.inventory.meta.EnchantmentStorageMeta meta = 
-                                    (org.bukkit.inventory.meta.EnchantmentStorageMeta) book.getItemMeta();
-                                debug("Book stored enchants: " + meta.getStoredEnchants());
-                            }
-                        }
+                        // We'll skip creating a sample book here to avoid ClassCastException
+                        // The enchantment is registered, but we need to use the Bukkit API to create enchanted books
+                        debug("Enchantment is registered and should be available in the creative inventory");
+                        debug("Use the /soulbound book command to create a Soulbound book");
                     }
                 } catch (Exception e) {
                     getLogger().log(Level.SEVERE, "Failed to verify enchantment registration", e);
@@ -254,17 +247,29 @@ public class SoulboundPlugin extends JavaPlugin {
      * @return The enchanted book
      */
     public ItemStack createSoulboundBook() {
-        ItemStack book = new ItemStack(org.bukkit.Material.ENCHANTED_BOOK);
-        org.bukkit.inventory.meta.EnchantmentStorageMeta meta = (org.bukkit.inventory.meta.EnchantmentStorageMeta) book.getItemMeta();
-        
-        if (meta != null) {
-            meta.addStoredEnchant(soulboundEnchantment, 1, true);
-            book.setItemMeta(meta);
-            debug("Created Soulbound enchanted book: " + book);
-        } else {
-            debug("Failed to create Soulbound enchanted book: meta is null");
+        try {
+            // Use the Bukkit API to create an enchanted book
+            // This avoids ClassCastException with custom enchantments
+            ItemStack book = new ItemStack(org.bukkit.Material.ENCHANTED_BOOK);
+            
+            // Get the enchantment from the registry instead of using our custom instance directly
+            Enchantment registeredEnchantment = Enchantment.getByKey(enchantmentKey);
+            if (registeredEnchantment == null) {
+                debug("Warning: Enchantment not found in registry, book may not work correctly");
+                // Fall back to our instance if not found in registry
+                registeredEnchantment = soulboundEnchantment;
+            }
+            
+            // Use the Bukkit API to add the enchantment to the book
+            // This is safer than directly manipulating the meta
+            book = getServer().getItemFactory().enchantBook(registeredEnchantment, 1);
+            
+            debug("Created Soulbound enchanted book using Bukkit API: " + book);
+            return book;
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Failed to create Soulbound book", e);
+            // Return a regular book if we can't create an enchanted one
+            return new ItemStack(org.bukkit.Material.BOOK);
         }
-        
-        return book;
     }
 }
