@@ -1,6 +1,7 @@
 package com.japherwocky.soulbound;
 
 import com.japherwocky.soulbound.enchantment.SoulboundEnchantment;
+import com.japherwocky.soulbound.util.EnchantmentTags;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.bootstrap.PluginProviderContext;
@@ -9,9 +10,14 @@ import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.TypedKey;
 import io.papermc.paper.registry.event.RegistryEvents;
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
+import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
+import io.papermc.paper.registry.tag.TagKey;
 import io.papermc.paper.tag.TagEntry;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
@@ -31,15 +37,13 @@ public class SoulboundBootstrapper implements PluginBootstrap {
         
         // Register the item tag for supported items
         context.getLifecycleManager().registerEventHandler(LifecycleEvents.TAGS.preFlatten(RegistryKey.ITEM).newHandler((event) -> {
-            logger.info("Registering item tag {}", SoulboundEnchantment.getTagForSupportedItems().key());
-            
-            // Create a new SoulboundEnchantment instance to get the supported items
-            NamespacedKey key = new NamespacedKey("soulbound", "soulbound");
-            SoulboundEnchantment enchantment = new SoulboundEnchantment(key);
+            // Get the tag key from our utility class to avoid loading the Enchantment class
+            TagKey<ItemType> supportedItemsTag = EnchantmentTags.getSoulboundSupportedItemsTag();
+            logger.info("Registering item tag {}", supportedItemsTag.key());
             
             // Register the tag with standard enchantable items
             event.registrar().addToTag(
-                    ItemTypeTagKeys.create(SoulboundEnchantment.getTagForSupportedItems().key()),
+                    supportedItemsTag,
                     Set.of(
                         TagEntry.tagEntry(ItemTypeTagKeys.ENCHANTABLE_ARMOR),
                         TagEntry.tagEntry(ItemTypeTagKeys.ENCHANTABLE_WEAPON),
@@ -55,20 +59,17 @@ public class SoulboundBootstrapper implements PluginBootstrap {
         context.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.freeze().newHandler(event -> {
             logger.info("Registering Soulbound enchantment");
             
-            // Create a new SoulboundEnchantment instance to get the configuration
-            NamespacedKey key = new NamespacedKey("soulbound", "soulbound");
-            SoulboundEnchantment enchantment = new SoulboundEnchantment(key);
-            
-            // Register the enchantment
-            event.registry().register(TypedKey.create(RegistryKey.ENCHANTMENT, SoulboundEnchantment.KEY), builder -> {
-                builder.description(enchantment.description());
-                builder.anvilCost(enchantment.getAnvilCost());
-                builder.maxLevel(enchantment.getMaxLevel());
-                builder.weight(enchantment.getWeight());
-                builder.minimumCost(enchantment.getMinimumCost());
-                builder.maximumCost(enchantment.getMaximumCost());
-                builder.activeSlots(enchantment.getActiveSlotGroups());
-                builder.supportedItems(event.getOrCreateTag(SoulboundEnchantment.getTagForSupportedItems()));
+            // Register the enchantment using the builder pattern
+            // We don't need to create a SoulboundEnchantment instance here
+            event.registry().register(TypedKey.create(RegistryKey.ENCHANTMENT, EnchantmentTags.SOULBOUND_KEY), builder -> {
+                builder.description(Component.text("Keeps items in your inventory when you die").color(NamedTextColor.GRAY));
+                builder.anvilCost(30);
+                builder.maxLevel(1);
+                builder.weight(1); // Rare enchantment
+                builder.minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(20, 0));
+                builder.maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(50, 0));
+                builder.activeSlots(Set.of(EquipmentSlotGroup.ANY));
+                builder.supportedItems(event.getOrCreateTag(EnchantmentTags.getSoulboundSupportedItemsTag()));
             });
         }));
         

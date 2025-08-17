@@ -3,6 +3,7 @@ package com.japherwocky.soulbound;
 import com.japherwocky.soulbound.api.SoulboundAPI;
 import com.japherwocky.soulbound.enchantment.SoulboundEnchantment;
 import com.japherwocky.soulbound.listeners.PlayerDeathListener;
+import com.japherwocky.soulbound.util.EnchantmentTags;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import net.kyori.adventure.key.Key;
@@ -35,7 +36,7 @@ public class SoulboundPlugin extends JavaPlugin {
         
         // Get the enchantment from the registry
         Registry<Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
-        soulboundEnchantment = registry.get(SoulboundEnchantment.KEY);
+        soulboundEnchantment = registry.get(EnchantmentTags.SOULBOUND_KEY);
         
         if (soulboundEnchantment == null) {
             getLogger().severe("Failed to get Soulbound enchantment from registry! The enchantment may not work correctly.");

@@ -31,7 +31,8 @@ import java.util.Set;
 @SuppressWarnings("UnstableApiUsage")
 public class SoulboundEnchantment extends Enchantment {
 
-    public static final Key KEY = Key.key("soulbound:soulbound");
+    // Use the key from the utility class
+    public static final Key KEY = com.japherwocky.soulbound.util.EnchantmentTags.SOULBOUND_KEY;
     
     private final NamespacedKey key;
     private final int anvilCost;
@@ -227,6 +228,6 @@ public class SoulboundEnchantment extends Enchantment {
     }
     
     public static TagKey<ItemType> getTagForSupportedItems() {
-        return TagKey.create(RegistryKey.ITEM, Key.key("soulbound:soulbound_enchantable"));
+        return com.japherwocky.soulbound.util.EnchantmentTags.getSoulboundSupportedItemsTag();
     }
 }
