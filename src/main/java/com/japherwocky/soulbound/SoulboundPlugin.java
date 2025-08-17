@@ -5,6 +5,7 @@ import com.japherwocky.soulbound.enchantment.SoulboundEnchantment;
 import com.japherwocky.soulbound.listeners.PlayerDeathListener;
 import com.japherwocky.soulbound.listeners.PlayerRespawnListener;
 import com.japherwocky.soulbound.persistence.SoulboundStorage;
+import io.papermc.paper.registry.TypedKey;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -153,27 +154,43 @@ public class SoulboundPlugin extends JavaPlugin {
 
     private void registerEnchantment() {
         try {
-            // Create enchantment instance
-            soulboundEnchantment = new SoulboundEnchantment(enchantmentKey);
+            // In Paper 1.21.8, custom enchantments are registered through the Registry API
+            // The actual registration is handled in the SoulboundBootstrapper class
             
-            // Register the enchantment using the Registry API
-            // In Paper 1.21.4, custom enchantments are registered differently
-            // The actual registration is handled by the server when it loads the plugin
-            
-            // Add enchanted book to creative inventory
-            // We'll use a delayed task to ensure the enchantment is registered before we try to create the book
+            // We'll use a delayed task to ensure the enchantment is registered before we try to use it
             getServer().getScheduler().runTaskLater(this, () -> {
                 try {
                     // Check if the enchantment is registered
                     Enchantment registeredEnchantment = Enchantment.getByKey(enchantmentKey);
                     if (registeredEnchantment == null) {
-                        debug("Enchantment not found in registry, attempting to register manually");
-                        // If the enchantment isn't in the registry, we need to register it manually
-                        // This is a fallback and shouldn't be necessary in most cases
+                        debug("Enchantment not found in registry, this is unexpected");
+                        debug("The enchantment should have been registered in the SoulboundBootstrapper");
                         
-                        // In Paper 1.21.4, enchantments are registered through the plugin.yml
-                        // But we can try to ensure it's available through our API
-                        registeredEnchantment = soulboundEnchantment;
+                        // Try to get the enchantment using the registry API
+                        try {
+                            // Create a TypedKey for our enchantment
+                            TypedKey<Enchantment> typedKey = TypedKey.create(
+                                io.papermc.paper.registry.RegistryKey.ENCHANTMENT, 
+                                net.kyori.adventure.key.Key.key("soulbound", "soulbound")
+                            );
+                            
+                            // Get the enchantment from the registry
+                            registeredEnchantment = io.papermc.paper.registry.RegistryAccess
+                                .registryAccess()
+                                .getRegistry(io.papermc.paper.registry.RegistryKey.ENCHANTMENT)
+                                .get(typedKey);
+                                
+                            if (registeredEnchantment != null) {
+                                debug("Found enchantment in registry using TypedKey: " + typedKey);
+                                // Store the enchantment for later use
+                                soulboundEnchantment = (SoulboundEnchantment) registeredEnchantment;
+                            }
+                        } catch (Exception e) {
+                            debug("Failed to get enchantment from registry: " + e.getMessage());
+                        }
+                    } else {
+                        // Store the enchantment for later use
+                        soulboundEnchantment = (SoulboundEnchantment) registeredEnchantment;
                     }
                     
                     debug("Enchantment registration status: " + (registeredEnchantment != null));
@@ -182,8 +199,6 @@ public class SoulboundPlugin extends JavaPlugin {
                         debug("Enchantment is discoverable: " + registeredEnchantment.isDiscoverable());
                         debug("Enchantment is tradeable: " + registeredEnchantment.isTradeable());
                         
-                        // We'll skip creating a sample book here to avoid ClassCastException
-                        // The enchantment is registered, but we need to use the Bukkit API to create enchanted books
                         debug("Enchantment is registered and should be available in the creative inventory");
                         debug("Use the /soulbound book command to create a Soulbound book");
                     }
