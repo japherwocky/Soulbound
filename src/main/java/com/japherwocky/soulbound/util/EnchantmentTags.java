@@ -54,7 +54,8 @@ public class EnchantmentTags {
         tags.add(EnchantmentTagKeys.IN_ENCHANTING_TABLE);
         
         // Add to discoverable tag to make it available in loot
-        tags.add(EnchantmentTagKeys.DISCOVERABLE);
+        // Create our own tag key since EnchantmentTagKeys.DISCOVERABLE is not available in this version
+        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:discoverable")));
         
         return tags;
     }
