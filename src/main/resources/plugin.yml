@@ -1,16 +1,19 @@
 name: Soulbound
 version: '${version}'
 main: com.japherwocky.soulbound.SoulboundPlugin
-description: A Minecraft enchantment for keeping items when you die.
 api-version: '1.21'
-bootstrapper: com.japherwocky.soulbound.SoulboundBootstrapper
 authors: [japherwocky]
+description: A Minecraft enchantment for keeping items when you die.
 website: https://github.com/japherwocky/Soulbound
+
+commands:
+  soulbound:
+    description: Soulbound plugin commands
+    usage: /soulbound [reload|info]
+    permission: soulbound.command
+
 permissions:
   soulbound.command:
     description: Allows access to Soulbound commands
-    default: op
-  soulbound.enchant:
-    description: Allows applying the Soulbound enchantment
     default: op
 

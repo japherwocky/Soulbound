@@ -1,176 +1,144 @@
 package com.japherwocky.soulbound.enchantment;
 
-import com.japherwocky.soulbound.SoulboundPlugin;
-import io.papermc.paper.enchantments.EnchantmentRarity;
 import io.papermc.paper.registry.RegistryKey;
-import io.papermc.paper.registry.set.RegistryKeySet;
-import io.papermc.paper.registry.set.RegistrySet;
+import io.papermc.paper.registry.TypedKey;
+import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
+import io.papermc.paper.registry.tag.TagKey;
+import io.papermc.paper.tag.TagEntry;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.EntityCategory;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlotGroup;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
+import java.util.*;
 
-public class SoulboundEnchantment extends Enchantment {
+@SuppressWarnings("UnstableApiUsage")
+public class SoulboundEnchantment {
 
-    private final NamespacedKey key;
-
-    public SoulboundEnchantment(NamespacedKey key) {
-        this.key = key;
+    public static final Key KEY = Key.key("soulbound:soulbound");
+    
+    private final int anvilCost;
+    private final int weight;
+    private final EnchantmentRegistryEntry.EnchantmentCost minimumCost;
+    private final EnchantmentRegistryEntry.EnchantmentCost maximumCost;
+    private final Set<TagEntry<ItemType>> supportedItemTags = new HashSet<>();
+    private final Set<TagKey<Enchantment>> enchantTagKeys = new HashSet<>();
+    
+    public SoulboundEnchantment(
+            int anvilCost,
+            int weight,
+            EnchantmentRegistryEntry.EnchantmentCost minimumCost,
+            EnchantmentRegistryEntry.EnchantmentCost maximumCost,
+            Collection<TagKey<Enchantment>> enchantTagKeys,
+            Collection<TagEntry<ItemType>> supportedItemTags
+    ) {
+        this.anvilCost = anvilCost;
+        this.weight = weight;
+        this.minimumCost = minimumCost;
+        this.maximumCost = maximumCost;
+        this.supportedItemTags.addAll(supportedItemTags);
+        this.enchantTagKeys.addAll(enchantTagKeys);
     }
-
-    @Override
-    public @NotNull NamespacedKey getKey() {
-        return key;
+    
+    @NotNull
+    public Key getKey() {
+        return KEY;
     }
-
-    @Override
+    
+    @NotNull
+    public Component getDescription() {
+        return Component.translatable("enchantment.soulbound.soulbound", "Keeps items in your inventory when you die");
+    }
+    
+    public int getAnvilCost() {
+        return anvilCost;
+    }
+    
     public int getMaxLevel() {
         return 1;
     }
-
-    @Override
-    public int getStartLevel() {
-        return 1;
-    }
-
-    @Override
-    public boolean isTreasure() {
-        return true;
-    }
-
-    @Override
-    public boolean isCursed() {
-        return false;
-    }
-
-    @Override
-    public boolean conflictsWith(@NotNull Enchantment other) {
-        return false;
-    }
-
-    @Override
-    public boolean canEnchantItem(@NotNull ItemStack item) {
-        if (SoulboundPlugin.getInstance().allowOnAllItems()) {
-            return true;
-        }
-        
-        // If not allowing on all items, only allow on items that can normally be enchanted
-        return item.getType().isItem() && item.getType().getMaxDurability() > 0;
-    }
-
-    @Override
-    public @NotNull Component displayName(int level) {
-        return Component.text("Soulbound").color(NamedTextColor.GRAY);
-    }
-
-    @Override
-    public boolean isTradeable() {
-        return false;
-    }
-
-    @Override
-    public boolean isDiscoverable() {
-        return false;
-    }
-
-    @Override
-    public @NotNull Component description() {
-        return Component.text("Keeps items in your inventory when you die").color(NamedTextColor.GRAY);
-    }
-
-    @Override
-    public @NotNull RegistryKeySet<ItemType> getSupportedItems() {
-        // Use the ITEM registry key
-        return RegistrySet.keySet(RegistryKey.ITEM);
-    }
-
-    @Override
-    public @Nullable RegistryKeySet<ItemType> getPrimaryItems() {
-        return null; // Use supported items
-    }
-
-    @Override
+    
     public int getWeight() {
-        return 1; // Rare enchantment
-    }
-
-    @Override
-    public int getAnvilCost() {
-        return 30;
-    }
-
-    @Override
-    public @NotNull Set<EquipmentSlotGroup> getActiveSlotGroups() {
-        return Set.of(EquipmentSlotGroup.ARMOR, EquipmentSlotGroup.HAND);
-    }
-
-    @Override
-    public @NotNull RegistryKeySet<Enchantment> getExclusiveWith() {
-        return RegistrySet.keySet(RegistryKey.ENCHANTMENT);
+        return weight;
     }
     
-    public @NotNull Component translationName() {
-        return Component.translatable("enchantment.soulbound.soulbound");
+    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMinimumCost() {
+        return minimumCost;
     }
     
-    @Override
-    public int getMinModifiedCost(int level) {
-        return 20;
+    public EnchantmentRegistryEntry.@NotNull EnchantmentCost getMaximumCost() {
+        return maximumCost;
     }
     
-    @Override
-    public int getMaxModifiedCost(int level) {
-        return 50;
+    @NotNull
+    public Iterable<EquipmentSlotGroup> getActiveSlots() {
+        return Set.of(EquipmentSlotGroup.ANY);
     }
     
-    @Override
-    @SuppressWarnings("deprecation")
-    public @NotNull String translationKey() {
-        return "enchantment.soulbound.soulbound";
+    @NotNull
+    public Set<TagEntry<ItemType>> getSupportedItems() {
+        return Collections.unmodifiableSet(supportedItemTags);
     }
     
-    @Override
-    @SuppressWarnings("deprecation")
-    public float getDamageIncrease(int level, EntityType entityType) {
-        return 0.0f; // Soulbound doesn't increase damage
+    @NotNull
+    public Set<TagKey<Enchantment>> getEnchantTagKeys() {
+        return Collections.unmodifiableSet(enchantTagKeys);
     }
     
-    @Override
-    @SuppressWarnings("deprecation")
-    public float getDamageIncrease(int level, EntityCategory entityCategory) {
-        return 0.0f; // Soulbound doesn't increase damage
+    @NotNull
+    public TagKey<ItemType> getTagForSupportedItems() {
+        return TagKey.create(RegistryKey.ITEM, Key.key(getKey().asString() + "_enchantable"));
     }
     
-    @Override
-    @SuppressWarnings("deprecation")
-    public @NotNull EnchantmentRarity getRarity() {
-        return EnchantmentRarity.RARE;
+    @NotNull
+    public TagEntry<Enchantment> getTagEntry() {
+        return TagEntry.valueEntry(TypedKey.create(RegistryKey.ENCHANTMENT, getKey()));
     }
     
-    @Override
-    @SuppressWarnings("deprecation")
-    public @NotNull EnchantmentTarget getItemTarget() {
-        return EnchantmentTarget.BREAKABLE;
+    public static SoulboundEnchantment create() {
+        // Create a default configuration for the Soulbound enchantment
+        return new SoulboundEnchantment(
+                30, // anvilCost
+                1,  // weight (rare)
+                EnchantmentRegistryEntry.EnchantmentCost.of(20, 0), // minimumCost
+                EnchantmentRegistryEntry.EnchantmentCost.of(50, 0), // maximumCost
+                getDefaultEnchantmentTags(),
+                getDefaultSupportedItems()
+        );
     }
     
-    @Override
-    @SuppressWarnings("deprecation")
-    public @NotNull String getName() {
-        return "Soulbound";
+    private static Set<TagKey<Enchantment>> getDefaultEnchantmentTags() {
+        Set<TagKey<Enchantment>> tags = new HashSet<>();
+        
+        // CRITICAL: Add to discoverable tag to make it available in creative mode
+        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:discoverable")));
+        
+        // Add to in_enchanting_table tag to make it available in the enchanting table
+        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:in_enchanting_table")));
+        
+        // Add to tradeable tag to make it available from villager trades
+        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:tradeable")));
+        
+        // Add to non_treasure tag to make it available in the enchanting table
+        tags.add(TagKey.create(RegistryKey.ENCHANTMENT, Key.key("minecraft:non_treasure")));
+        
+        return tags;
     }
     
-    @Override
-    public @NotNull String getTranslationKey() {
-        return "enchantment.soulbound.soulbound";
+    private static Set<TagEntry<ItemType>> getDefaultSupportedItems() {
+        Set<TagEntry<ItemType>> supportedItems = new HashSet<>();
+        
+        // Add standard enchantable items
+        supportedItems.add(TagEntry.tagEntry(TagKey.create(RegistryKey.ITEM, Key.key("minecraft:enchantable/armor"))));
+        supportedItems.add(TagEntry.tagEntry(TagKey.create(RegistryKey.ITEM, Key.key("minecraft:enchantable/weapon"))));
+        supportedItems.add(TagEntry.tagEntry(TagKey.create(RegistryKey.ITEM, Key.key("minecraft:enchantable/mining"))));
+        supportedItems.add(TagEntry.tagEntry(TagKey.create(RegistryKey.ITEM, Key.key("minecraft:enchantable/crossbow"))));
+        supportedItems.add(TagEntry.tagEntry(TagKey.create(RegistryKey.ITEM, Key.key("minecraft:enchantable/bow"))));
+        supportedItems.add(TagEntry.tagEntry(TagKey.create(RegistryKey.ITEM, Key.key("minecraft:enchantable/trident"))));
+        
+        return supportedItems;
     }
 }
+
