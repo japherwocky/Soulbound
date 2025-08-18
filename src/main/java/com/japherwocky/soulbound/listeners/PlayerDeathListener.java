@@ -1,65 +1,79 @@
 package com.japherwocky.soulbound.listeners;
 
 import com.japherwocky.soulbound.SoulboundPlugin;
-import com.japherwocky.soulbound.api.SoulboundAPI;
+import com.japherwocky.soulbound.enchantment.SoulboundEnchantment;
 import com.japherwocky.soulbound.persistence.SoulboundStorage;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import org.bukkit.Registry;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import java.util.UUID;
 
+@SuppressWarnings("UnstableApiUsage")
 public class PlayerDeathListener implements Listener {
 
+    private final Registry<Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
+    private final Enchantment soulbound;
     private final SoulboundPlugin plugin;
-    private final Random random = new Random();
 
     public PlayerDeathListener(SoulboundPlugin plugin) {
         this.plugin = plugin;
+        this.soulbound = registry.get(SoulboundEnchantment.KEY);
+        
+        if (soulbound == null) {
+            plugin.getLogger().severe("Failed to get Soulbound enchantment from registry! The enchantment may not work correctly.");
+        } else {
+            plugin.getLogger().info("Successfully obtained Soulbound enchantment from registry!");
+        }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.NORMAL)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        Player player = event.getEntity();
-        List<ItemStack> drops = event.getDrops();
+        if (soulbound == null) {
+            plugin.getLogger().warning("Soulbound enchantment is null! Cannot process death event.");
+            return;
+        }
+        
+        Player player = event.getPlayer();
+        UUID playerId = player.getUniqueId();
+        PlayerInventory inventory = player.getInventory();
         List<SoulboundStorage.SoulboundItem> soulboundItems = new ArrayList<>();
         
         // Process inventory items
-        Iterator<ItemStack> iterator = drops.iterator();
-        while (iterator.hasNext()) {
-            ItemStack item = iterator.next();
-            if (item != null && SoulboundAPI.hasSoulbound(item)) {
-                plugin.debug("Found soulbound item: " + item.getType());
+        for (int slot = 0; slot < inventory.getSize(); slot++) {
+            ItemStack itemStack = inventory.getItem(slot);
+            if (itemStack != null && itemStack.containsEnchantment(soulbound)) {
+                plugin.debug("Found soulbound item: " + itemStack.getType() + " in slot " + slot);
+                
+                // Store the item for respawn
+                soulboundItems.add(new SoulboundStorage.SoulboundItem(itemStack.clone(), slot));
+                
+                // Add the item to the keep list
+                event.getItemsToKeep().add(itemStack);
+                event.getDrops().remove(itemStack);
                 
                 // Check if the enchantment should be removed
-                boolean removeEnchant = random.nextDouble() < plugin.getRemovalChance();
-                if (removeEnchant) {
+                if (plugin.shouldRemoveEnchantment()) {
                     plugin.debug("Removing Soulbound enchantment from item");
-                    ItemMeta meta = item.getItemMeta();
-                    meta.removeEnchant(plugin.getSoulboundEnchantment());
-                    item.setItemMeta(meta);
+                    itemStack.removeEnchantment(soulbound);
                 }
-                
-                // Store the item for restoration on respawn
-                soulboundItems.add(new SoulboundStorage.SoulboundItem(item.clone(), player.getInventory().first(item)));
-                
-                // Remove the item from drops
-                iterator.remove();
             }
         }
         
         // Store soulbound items for this player
         if (!soulboundItems.isEmpty()) {
             plugin.debug("Storing " + soulboundItems.size() + " soulbound items for player " + player.getName());
-            plugin.getStorage().storeSoulboundItems(player.getUniqueId(), soulboundItems);
+            plugin.getStorage().storeSoulboundItems(playerId, soulboundItems);
         }
     }
 }
-

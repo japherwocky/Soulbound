@@ -5,29 +5,33 @@ import com.japherwocky.soulbound.enchantment.SoulboundEnchantment;
 import com.japherwocky.soulbound.listeners.PlayerDeathListener;
 import com.japherwocky.soulbound.listeners.PlayerRespawnListener;
 import com.japherwocky.soulbound.persistence.SoulboundStorage;
-import org.bukkit.NamespacedKey;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import org.bukkit.Registry;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Random;
 import java.util.logging.Level;
 
+@SuppressWarnings("UnstableApiUsage")
 public class SoulboundPlugin extends JavaPlugin {
 
     private static SoulboundPlugin instance;
-    private SoulboundEnchantment soulboundEnchantment;
+    private Enchantment soulboundEnchantment;
+    private final Random random = new Random();
+    private double removalChance = 0.0;
+    private boolean debug = false;
     private SoulboundStorage storage;
-    private NamespacedKey enchantmentKey;
 
     @Override
     public void onLoad() {
         instance = this;
-        enchantmentKey = new NamespacedKey(this, "soulbound");
         
-        // Register serialization classes
-        ConfigurationSerialization.registerClass(SoulboundStorage.SoulboundItem.class);
+        // Register SoulboundItem for serialization
+        org.bukkit.configuration.serialization.ConfigurationSerialization.registerClass(SoulboundStorage.SoulboundItem.class);
     }
 
     @Override
@@ -35,11 +39,21 @@ public class SoulboundPlugin extends JavaPlugin {
         // Save default config
         saveDefaultConfig();
         
+        // Load configuration
+        reloadConfig();
+        
         // Initialize storage
         storage = new SoulboundStorage(this);
         
-        // Register enchantment
-        registerEnchantment();
+        // Get the enchantment from the registry
+        Registry<Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
+        soulboundEnchantment = registry.get(SoulboundEnchantment.KEY);
+        
+        if (soulboundEnchantment == null) {
+            getLogger().severe("Failed to get Soulbound enchantment from registry! The enchantment may not work correctly.");
+        } else {
+            getLogger().info("Successfully obtained Soulbound enchantment from registry!");
+        }
         
         // Register event listeners
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
@@ -53,16 +67,9 @@ public class SoulboundPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Save any pending data
+        // Save any pending storage changes
         if (storage != null) {
             storage.saveAll();
-        }
-        
-        // Unregister enchantment
-        try {
-            unregisterEnchantment();
-        } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Failed to unregister Soulbound enchantment", e);
         }
         
         getLogger().info("Soulbound has been disabled!");
@@ -72,78 +79,51 @@ public class SoulboundPlugin extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("soulbound")) {
             if (args.length == 0) {
-                sender.sendMessage("§6Soulbound §7v" + getDescription().getVersion());
-                sender.sendMessage("§7An enchantment that will retain items upon death");
+                sender.sendMessage("§6Soulbound §7v" + getDescription().getVersion() + " by " + getDescription().getAuthors().get(0));
                 return true;
             }
             
             if (args[0].equalsIgnoreCase("reload") && sender.hasPermission("soulbound.command")) {
                 reloadConfig();
-                storage.reload();
                 sender.sendMessage("§6Soulbound §7configuration reloaded!");
                 return true;
             }
             
             if (args[0].equalsIgnoreCase("info") && sender.hasPermission("soulbound.command")) {
                 sender.sendMessage("§6Soulbound §7Configuration:");
-                sender.sendMessage("§7- Removal Chance: §f" + getConfig().getDouble("soulbound-removal-chance"));
-                sender.sendMessage("§7- Allow on All Items: §f" + getConfig().getBoolean("allow-on-all-items"));
-                sender.sendMessage("§7- Debug Mode: §f" + getConfig().getBoolean("debug"));
+                sender.sendMessage("§7- Removal Chance: §f" + getConfig().getDouble("soulbound-removal-chance", 0.0));
+                sender.sendMessage("§7- Debug Mode: §f" + getConfig().getBoolean("debug", false));
                 return true;
             }
         }
         return false;
     }
 
-    private void registerEnchantment() {
-        try {
-            // Create enchantment instance
-            soulboundEnchantment = new SoulboundEnchantment(enchantmentKey);
-            
-            // Register the enchantment using the Registry API
-            // In Paper 1.21.4, custom enchantments are registered differently
-            // We'll just create the enchantment instance and make it available via the API
-            // The actual registration is handled by the server when it loads the plugin
-            
-            getLogger().info("Successfully registered Soulbound enchantment!");
-        } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Failed to register Soulbound enchantment", e);
-        }
-    }
-
-    private void unregisterEnchantment() throws Exception {
-        // In Paper 1.21.4, we don't need to manually unregister enchantments
-        // The registry will handle this when the plugin is disabled
-        getLogger().info("Soulbound enchantment will be unregistered automatically");
-    }
-
-    public SoulboundEnchantment getSoulboundEnchantment() {
+    public Enchantment getSoulboundEnchantment() {
         return soulboundEnchantment;
-    }
-
-    public SoulboundStorage getStorage() {
-        return storage;
     }
 
     public static SoulboundPlugin getInstance() {
         return instance;
     }
-
-    public double getRemovalChance() {
-        return getConfig().getDouble("soulbound-removal-chance", 0.0);
+    
+    public void reloadConfig() {
+        super.reloadConfig();
+        this.removalChance = getConfig().getDouble("soulbound-removal-chance", 0.0);
+        this.debug = getConfig().getBoolean("debug", false);
     }
-
-    public boolean allowOnAllItems() {
-        return getConfig().getBoolean("allow-on-all-items", true);
+    
+    public boolean shouldRemoveEnchantment() {
+        return random.nextDouble() < removalChance;
     }
-
-    public boolean isDebugEnabled() {
-        return getConfig().getBoolean("debug", false);
-    }
-
+    
     public void debug(String message) {
-        if (isDebugEnabled()) {
+        if (debug) {
             getLogger().info("[DEBUG] " + message);
         }
+    }
+    
+    public SoulboundStorage getStorage() {
+        return storage;
     }
 }
