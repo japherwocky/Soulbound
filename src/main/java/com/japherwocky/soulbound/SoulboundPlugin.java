@@ -3,6 +3,8 @@ package com.japherwocky.soulbound;
 import com.japherwocky.soulbound.api.SoulboundAPI;
 import com.japherwocky.soulbound.enchantment.SoulboundEnchantment;
 import com.japherwocky.soulbound.listeners.PlayerDeathListener;
+import com.japherwocky.soulbound.listeners.PlayerRespawnListener;
+import com.japherwocky.soulbound.persistence.SoulboundStorage;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import org.bukkit.Registry;
@@ -22,10 +24,14 @@ public class SoulboundPlugin extends JavaPlugin {
     private final Random random = new Random();
     private double removalChance = 0.0;
     private boolean debug = false;
+    private SoulboundStorage storage;
 
     @Override
     public void onLoad() {
         instance = this;
+        
+        // Register SoulboundItem for serialization
+        org.bukkit.configuration.serialization.ConfigurationSerialization.registerClass(SoulboundStorage.SoulboundItem.class);
     }
 
     @Override
@@ -35,6 +41,9 @@ public class SoulboundPlugin extends JavaPlugin {
         
         // Load configuration
         reloadConfig();
+        
+        // Initialize storage
+        storage = new SoulboundStorage(this);
         
         // Get the enchantment from the registry
         Registry<Enchantment> registry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
@@ -48,6 +57,7 @@ public class SoulboundPlugin extends JavaPlugin {
         
         // Register event listeners
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerRespawnListener(this), this);
         
         // Initialize API
         SoulboundAPI.init(this);
@@ -57,6 +67,11 @@ public class SoulboundPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // Save any pending storage changes
+        if (storage != null) {
+            storage.saveAll();
+        }
+        
         getLogger().info("Soulbound has been disabled!");
     }
 
@@ -107,5 +122,8 @@ public class SoulboundPlugin extends JavaPlugin {
             getLogger().info("[DEBUG] " + message);
         }
     }
+    
+    public SoulboundStorage getStorage() {
+        return storage;
+    }
 }
-
